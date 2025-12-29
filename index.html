@@ -1,0 +1,499 @@
+<!-- S_GhostEngine_Lite_v1.html -->
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S STUDIO | Ghost Engine Lite</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            color: #111827;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Custom Scrollbar for sleek look */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #e5e7eb;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #d1d5db;
+        }
+
+        /* Ghost Engine Layering & Effects */
+        .ghost-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: all 0.3s ease;
+        }
+        
+        .layer-inner {
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
+        }
+
+        .loader {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #1a1a1a;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        // --- IndexedDB Service ---
+        const DB_NAME = 'DbSSTUDIO_Vault';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'wardrobe';
+
+        const dbService = {
+            open: () => {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(DB_NAME, DB_VERSION);
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        if (!db.objectStoreNames.contains(STORE_NAME)) {
+                            db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                        }
+                    };
+                    request.onsuccess = (event) => resolve(event.target.result);
+                    request.onerror = (event) => reject(event.target.error);
+                });
+            },
+            addItem: async (item) => {
+                const db = await dbService.open();
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([STORE_NAME], 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    const request = store.add(item);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            },
+            getAllItems: async () => {
+                const db = await dbService.open();
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([STORE_NAME], 'readonly');
+                    const store = transaction.objectStore(STORE_NAME);
+                    const request = store.getAll();
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            },
+            deleteItem: async (id) => {
+                const db = await dbService.open();
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([STORE_NAME], 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    const request = store.delete(id);
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
+                });
+            }
+        };
+
+        // --- Icons ---
+        const IconHanger = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12.707 3.293a1 1 0 0 0-1.414 0L3 11.586V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8.414l-8.293-8.293z"/><path d="M12 3v19"/></svg>
+        );
+        const IconGhost = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 22v-3h6v3"/><path d="M12 2a4 4 0 0 0-4 4v16h8V6a4 4 0 0 0-4-4z"/><circle cx="12" cy="10" r="1"/></svg>
+        );
+        const IconPlus = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        );
+        const IconTrash = () => (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        );
+
+        // --- Main Application ---
+        const App = () => {
+            const [view, setView] = useState('studio'); // 'studio' | 'warehouse'
+            const [inventory, setInventory] = useState([]);
+            
+            // Outfit State
+            const [outfit, setOutfit] = useState({
+                inner: null,
+                bottom: null,
+                shoes: null
+            });
+
+            // Form State
+            const [newItem, setNewItem] = useState({
+                slot: 'inner', // inner, bottom, shoes
+                category: 'Short T', // Specific logic for inner
+                color: '#1A1A1A',
+                url: ''
+            });
+            const [isSaving, setIsSaving] = useState(false);
+
+            // Load Data
+            const loadInventory = async () => {
+                try {
+                    const items = await dbService.getAllItems();
+                    setInventory(items);
+                } catch (err) {
+                    console.error("DB Load Error:", err);
+                }
+            };
+
+            useEffect(() => {
+                loadInventory();
+            }, []);
+
+            // Handlers
+            const handleSaveItem = async () => {
+                if (!newItem.url.trim()) return alert("請輸入圖片 URL");
+                
+                setIsSaving(true);
+                const itemToSave = {
+                    ...newItem,
+                    createdAt: Date.now()
+                };
+
+                try {
+                    await dbService.addItem(itemToSave);
+                    await loadInventory();
+                    setNewItem({ ...newItem, url: '' }); // Reset URL only
+                    alert("作品已入庫");
+                } catch (err) {
+                    alert("儲存失敗");
+                } finally {
+                    setIsSaving(false);
+                }
+            };
+
+            const handleDeleteItem = async (id) => {
+                if (confirm("確認移除此單品？")) {
+                    await dbService.deleteItem(id);
+                    // Also remove from outfit if wearing
+                    if (outfit.inner?.id === id) setOutfit(p => ({...p, inner: null}));
+                    if (outfit.bottom?.id === id) setOutfit(p => ({...p, bottom: null}));
+                    if (outfit.shoes?.id === id) setOutfit(p => ({...p, shoes: null}));
+                    loadInventory();
+                }
+            };
+
+            const equipItem = (item) => {
+                setOutfit(prev => ({
+                    ...prev,
+                    [item.slot]: item
+                }));
+            };
+
+            // Filter Inventory Helper
+            const getFilteredInventory = (slot) => {
+                return inventory.filter(i => i.slot === slot).reverse(); // Newest first
+            };
+
+            // UI Components
+            const TabButton = ({ active, onClick, icon, label }) => (
+                <button 
+                    onClick={onClick}
+                    className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors border-b-2 ${
+                        active 
+                        ? 'border-gray-900 text-gray-900' 
+                        : 'border-transparent text-gray-400 hover:text-gray-600'
+                    }`}
+                >
+                    {icon}
+                    <span>{label}</span>
+                </button>
+            );
+
+            return (
+                <div className="min-h-screen flex flex-col max-w-5xl mx-auto bg-white shadow-2xl overflow-hidden">
+                    {/* Header */}
+                    <header className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-white z-50">
+                        <div>
+                            <h1 className="text-xl font-bold tracking-tight text-gray-900">S STUDIO</h1>
+                            <p className="text-xs text-gray-400 tracking-widest mt-1">GHOST ENGINE V1.0</p>
+                        </div>
+                        <nav className="flex">
+                            <TabButton 
+                                active={view === 'studio'} 
+                                onClick={() => setView('studio')} 
+                                icon={<IconGhost />} 
+                                label="STUDIO" 
+                            />
+                            <TabButton 
+                                active={view === 'warehouse'} 
+                                onClick={() => setView('warehouse')} 
+                                icon={<IconHanger />} 
+                                label="WAREHOUSE" 
+                            />
+                        </nav>
+                    </header>
+
+                    {/* Content Area */}
+                    <main className="flex-1 flex overflow-hidden">
+                        
+                        {/* STUDIO VIEW */}
+                        {view === 'studio' && (
+                            <div className="flex-1 flex flex-col md:flex-row h-full">
+                                {/* Left: Wardrobe Selector */}
+                                <div className="w-full md:w-80 border-r border-gray-100 overflow-y-auto bg-gray-50 p-6 space-y-8">
+                                    {['inner', 'bottom', 'shoes'].map(slot => (
+                                        <div key={slot}>
+                                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center justify-between">
+                                                {slot === 'inner' ? '上身 Inner' : slot === 'bottom' ? '下身 Bottom' : '鞋款 Shoes'}
+                                                <span className="text-gray-300 text-[10px]">{getFilteredInventory(slot).length}</span>
+                                            </h3>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                {getFilteredInventory(slot).map(item => (
+                                                    <div 
+                                                        key={item.id} 
+                                                        onClick={() => equipItem(item)}
+                                                        className={`aspect-square bg-white border cursor-pointer hover:border-gray-400 transition-all flex items-center justify-center relative overflow-hidden group ${
+                                                            outfit[slot]?.id === item.id ? 'border-gray-900 ring-1 ring-gray-900' : 'border-gray-200'
+                                                        }`}
+                                                    >
+                                                        <img src={item.url} alt={item.category} className="w-full h-full object-cover opacity-90 group-hover:opacity-100" />
+                                                    </div>
+                                                ))}
+                                                {getFilteredInventory(slot).length === 0 && (
+                                                    <div className="col-span-3 py-4 text-center text-xs text-gray-400 border border-dashed border-gray-200">
+                                                        無單品 (請至倉庫新增)
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Right: The Ghost Engine Canvas */}
+                                <div className="flex-1 bg-[#f0f0f0] flex items-center justify-center relative overflow-hidden">
+                                    <div className="relative w-full max-w-md h-[80vh] bg-transparent">
+                                        {/* Shoes Layer: Z-10 */}
+                                        {outfit.shoes && (
+                                            <div className="absolute bottom-[5%] left-0 w-full h-[25%] z-10 flex justify-center items-end">
+                                                <img 
+                                                    src={outfit.shoes.url} 
+                                                    className="ghost-layer object-contain object-bottom"
+                                                    alt="Shoes"
+                                                />
+                                            </div>
+                                        )}
+                                        
+                                        {/* Bottom Layer: Z-20 */}
+                                        {outfit.bottom && (
+                                            <div className="absolute bottom-[15%] left-0 w-full h-[50%] z-20 flex justify-center items-end">
+                                                <img 
+                                                    src={outfit.bottom.url} 
+                                                    className="ghost-layer object-contain object-bottom" 
+                                                    alt="Bottom"
+                                                />
+                                            </div>
+                                        )}
+
+                                        {/* Inner Layer: Z-30 (With Drop Shadow) */}
+                                        {outfit.inner && (
+                                            <div className="absolute top-[10%] left-0 w-full h-[60%] z-30 flex justify-center items-start">
+                                                <img 
+                                                    src={outfit.inner.url} 
+                                                    className="ghost-layer layer-inner object-contain object-top" 
+                                                    alt="Inner"
+                                                />
+                                            </div>
+                                        )}
+
+                                        {/* Empty State Placeholder */}
+                                        {!outfit.inner && !outfit.bottom && !outfit.shoes && (
+                                            <div className="absolute inset-0 flex items-center justify-center text-gray-300 pointer-events-none">
+                                                <span className="tracking-widest text-sm">S STUDIO GHOST ENGINE</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* WAREHOUSE VIEW */}
+                        {view === 'warehouse' && (
+                            <div className="flex-1 overflow-y-auto p-8 md:p-12 max-w-3xl mx-auto w-full">
+                                <div className="space-y-12">
+                                    
+                                    {/* Input Section */}
+                                    <section>
+                                        <h2 className="text-2xl font-light text-gray-900 mb-8 border-l-4 border-gray-900 pl-4">單品入庫</h2>
+                                        
+                                        <div className="grid gap-8 bg-gray-50 p-8 border border-gray-100">
+                                            
+                                            {/* 1. URL Input */}
+                                            <div className="space-y-3">
+                                                <label className="block text-xs font-bold uppercase tracking-wider text-gray-500">圖片連結 (URL)</label>
+                                                <div className="flex gap-2">
+                                                    <input 
+                                                        type="text" 
+                                                        value={newItem.url}
+                                                        onChange={(e) => setNewItem({...newItem, url: e.target.value})}
+                                                        placeholder="https://..."
+                                                        className="flex-1 bg-white border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-gray-900 transition-colors placeholder-gray-300"
+                                                    />
+                                                </div>
+                                                {newItem.url && (
+                                                    <div className="mt-2 h-32 w-32 border border-gray-200 bg-white flex items-center justify-center overflow-hidden">
+                                                        <img src={newItem.url} className="max-h-full max-w-full object-contain" onError={(e) => e.target.style.display='none'} />
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="grid md:grid-cols-2 gap-8">
+                                                {/* 2. Position & Category */}
+                                                <div className="space-y-4">
+                                                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500">位置與分類</label>
+                                                    
+                                                    {/* Main Slot */}
+                                                    <div className="flex gap-2">
+                                                        {['inner', 'bottom', 'shoes'].map(slot => (
+                                                            <button
+                                                                key={slot}
+                                                                onClick={() => setNewItem({...newItem, slot, category: slot === 'inner' ? 'Short T' : 'Default'})}
+                                                                className={`flex-1 py-2 text-xs font-medium border ${
+                                                                    newItem.slot === slot 
+                                                                    ? 'bg-gray-900 text-white border-gray-900' 
+                                                                    : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400'
+                                                                }`}
+                                                            >
+                                                                {slot === 'inner' ? '上身' : slot === 'bottom' ? '下身' : '鞋款'}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+
+                                                    {/* Sub Category (Only for Inner as per spec) */}
+                                                    {newItem.slot === 'inner' && (
+                                                        <div className="pt-2 space-y-2">
+                                                            <p className="text-[10px] text-gray-400">款式選擇</p>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {['Short T', 'Long T', 'Sweatshirt'].map(cat => (
+                                                                    <button
+                                                                        key={cat}
+                                                                        onClick={() => setNewItem({...newItem, category: cat})}
+                                                                        className={`px-3 py-1.5 text-xs border ${
+                                                                            newItem.category === cat 
+                                                                            ? 'border-gray-900 text-gray-900 ring-1 ring-gray-900' 
+                                                                            : 'border-gray-200 text-gray-400'
+                                                                        }`}
+                                                                    >
+                                                                        {cat === 'Short T' ? '短T' : cat === 'Long T' ? '長T' : '衛衣'}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* 3. Color */}
+                                                <div className="space-y-4">
+                                                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500">配色</label>
+                                                    <div className="flex gap-4">
+                                                        <button 
+                                                            onClick={() => setNewItem({...newItem, color: '#1A1A1A'})}
+                                                            className={`w-12 h-12 rounded-sm bg-[#1A1A1A] border-2 flex items-center justify-center ${
+                                                                newItem.color === '#1A1A1A' ? 'border-gray-400 ring-2 ring-gray-200' : 'border-transparent'
+                                                            }`}
+                                                            title="Black"
+                                                        >
+                                                            {newItem.color === '#1A1A1A' && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => setNewItem({...newItem, color: '#FFFFFF'})}
+                                                            className={`w-12 h-12 rounded-sm bg-white border-2 flex items-center justify-center ${
+                                                                newItem.color === '#FFFFFF' ? 'border-gray-900 ring-2 ring-gray-100' : 'border-gray-200'
+                                                            }`}
+                                                            title="White"
+                                                        >
+                                                            {newItem.color === '#FFFFFF' && <div className="w-1.5 h-1.5 bg-black rounded-full"></div>}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Action */}
+                                            <div className="pt-4 border-t border-gray-100">
+                                                <button 
+                                                    onClick={handleSaveItem}
+                                                    disabled={isSaving}
+                                                    className="w-full bg-gray-900 text-white py-4 text-sm font-bold tracking-widest hover:bg-black transition-colors disabled:bg-gray-400 flex justify-center items-center gap-2"
+                                                >
+                                                    {isSaving ? <div className="loader"></div> : <><IconPlus /> 存入作品</>}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    {/* Inventory List (Manage) */}
+                                    <section>
+                                        <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">現有庫存管理 ({inventory.length})</h2>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                            {inventory.map(item => (
+                                                <div key={item.id} className="group relative bg-white border border-gray-200 aspect-[3/4] flex flex-col items-center">
+                                                    <div className="flex-1 w-full p-4 flex items-center justify-center overflow-hidden">
+                                                        <img src={item.url} alt="item" className="max-w-full max-h-full object-contain" />
+                                                    </div>
+                                                    <div className="w-full p-2 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[10px] font-bold text-gray-900 uppercase">{item.category}</span>
+                                                            <span className="text-[9px] text-gray-400 uppercase">{item.slot}</span>
+                                                        </div>
+                                                        <button 
+                                                            onClick={() => handleDeleteItem(item.id)}
+                                                            className="text-gray-400 hover:text-red-600 transition-colors p-1"
+                                                        >
+                                                            <IconTrash />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
