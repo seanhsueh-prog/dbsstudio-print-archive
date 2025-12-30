@@ -1,17 +1,18 @@
-<!-- DbSSTUDIO-Showroom.v1.3.html -->
+<!-- DbSSTUDIO-Showroom.v1.5.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DbSSTUDIO Showroom v1.3</title>
+    <title>DbSSTUDIO v1.5 - Digital Archive</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [DbSSTUDIO - Minimalist Aesthetics] */
+        /* [DbSSTUDIO v1.5 - Minimalist / Commercial Standard] */
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             -webkit-font-smoothing: antialiased; 
-            background-color: #111; 
+            background-color: #F9F9F9; /* Advanced Light Gray */
             color: #111; 
             margin: 0;
             min-height: 100vh;
@@ -24,9 +25,9 @@
             width: 100%;
             max-width: 480px; 
             height: 100vh; 
-            background-color: #ffffff;
+            background-color: #F9F9F9;
             position: relative;
-            box-shadow: 0 0 60px rgba(0,0,0,0.6);
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -35,179 +36,117 @@
         .content-area {
             flex: 1;
             overflow-y: auto;
-            padding-bottom: 80px; 
+            padding-bottom: 90px; /* Space for Bottom Nav */
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
         .content-area::-webkit-scrollbar { display: none; }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
+        /* Fade Animation */
         @keyframes fade-in {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fade-in { animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-fade-in { animation: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
+        /* Product Card */
+        .product-card {
+            background: #fff;
+            border-radius: 0; 
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 24px;
+            border: 1px solid #f0f0f0;
+        }
+        
+        /* Hide Broken Images Cleanly */
+        .product-card.hidden-card { display: none !important; }
+
+        .size-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #888;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .size-btn.active {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+        }
+
+        /* Ghost Engine Refined */
         .ghost-canvas-container {
             position: relative;
             width: 100%;
             aspect-ratio: 4 / 5; 
-            background-color: #f9fafb;
+            background-color: #fff;
             overflow: hidden;
-            border-bottom: 1px solid #f0f0f0;
         }
 
         .ghost-layer {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             object-fit: contain; 
             object-position: bottom center;
             pointer-events: none;
             transition: opacity 0.3s ease-in-out;
-            will-change: transform, opacity; 
         }
 
-        /* Floating Control Stack */
-        .floating-controls {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-40%); 
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            z-index: 50;
-        }
-
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(8px);
-            border-radius: 99px; 
-            padding: 4px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border: 1px solid rgba(255,255,255,0.5);
-        }
-
-        .mini-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: 700;
-            color: #9ca3af;
-            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-            cursor: pointer;
-            margin-bottom: 2px;
-        }
-        .mini-btn:last-child { margin-bottom: 0; }
-        
-        .mini-btn.active {
-            background-color: #000;
-            color: #fff;
-            transform: scale(1.05);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        /* Dense Card */
-        .dense-card {
-            aspect-ratio: 1/1;
-            position: relative;
-            background: #fff;
-            border-radius: 0.75rem;
-            border: 1px solid #f3f4f6;
-            overflow: hidden; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: border-color 0.2s;
-            padding: 0; 
-        }
-        .dense-card:active { transform: scale(0.98); }
-        .dense-card img { width: 100%; height: 100%; object-fit: contain; padding: 2px; }
-
-        /* Warehouse Items */
-        .warehouse-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-            padding-bottom: 2rem;
-        }
-        .warehouse-item {
-            aspect-ratio: 3/4;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            padding: 0; 
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            background: #fff;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .warehouse-item:active { transform: scale(0.98); border-color: #000; }
-        .warehouse-item img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
-
-        /* Category Pills */
-        .cat-pill {
-            padding: 6px 12px;
-            border-radius: 999px;
-            font-size: 11px;
-            font-weight: 600;
-            white-space: nowrap;
-            transition: all 0.2s;
-            border: 1px solid #eee;
-            cursor: pointer;
-        }
-        .cat-pill.active {
-            background-color: #000;
-            color: #fff;
-            border-color: #000;
-        }
-        .cat-pill.inactive {
-            background-color: #fff;
-            color: #666;
-        }
-
-        /* Bottom Navigation */
+        /* Bottom Navigation - Commercial Style */
         .bottom-nav {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
+            bottom: 0; left: 0; width: 100%;
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid #eee;
+            backdrop-filter: blur(12px);
+            border-top: 1px solid #eaeaea;
             display: flex;
             justify-content: space-around;
-            padding: 12px 0 24px 0; 
+            padding: 16px 0 32px 0; 
             z-index: 50;
         }
         .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
             font-size: 10px;
             font-weight: 600;
-            color: #9ca3af;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
+            text-align: center;
             transition: color 0.2s;
-            flex: 1;
         }
         .nav-item.active { color: #000; }
-        .nav-item:active svg { transform: scale(0.9); }
+        
+        /* Lightbox */
+        .lightbox {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.98);
+            z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            animation: fade-in 0.2s;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 90;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background: #fff;
+            width: 100%; max-width: 320px;
+            padding: 24px;
+            border-radius: 4px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
@@ -218,387 +157,302 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo, useRef, useCallback } = React;
+        const { useState, useEffect, useMemo, useCallback } = React;
 
-        // --- 1. CORE UTILS: IndexedDB (DbS v1.3) ---
-        const DB_CONFIG = { name: 'DbSSTUDIO_Vault_V1.3', version: 1, store: 'inventory' };
-
-        const dbHelper = {
-            open: () => {
-                return new Promise((resolve, reject) => {
-                    const request = indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
-                    request.onupgradeneeded = (e) => {
-                        const db = e.target.result;
-                        if (!db.objectStoreNames.contains(DB_CONFIG.store)) {
-                            db.createObjectStore(DB_CONFIG.store, { keyPath: 'id', autoIncrement: true });
-                        }
-                    };
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            },
-            addItem: async (item) => {
-                const db = await dbHelper.open();
-                return new Promise((resolve, reject) => {
-                    const tx = db.transaction(DB_CONFIG.store, 'readwrite');
-                    const request = tx.objectStore(DB_CONFIG.store).add(item);
-                    request.onsuccess = () => resolve({ ...item, id: request.result });
-                    request.onerror = () => reject(request.error);
-                });
-            },
-            getAllItems: async () => {
-                const db = await dbHelper.open();
-                return new Promise((resolve, reject) => {
-                    const tx = db.transaction(DB_CONFIG.store, 'readonly');
-                    const request = tx.objectStore(DB_CONFIG.store).getAll();
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            },
-            deleteItem: async (id) => {
-                const db = await dbHelper.open();
-                return new Promise((resolve, reject) => {
-                    const tx = db.transaction(DB_CONFIG.store, 'readwrite');
-                    const request = tx.objectStore(DB_CONFIG.store).delete(id);
-                    request.onsuccess = () => resolve();
-                    request.onerror = () => reject(request.error);
-                });
-            }
-        };
-
-        // --- 2. CONFIGURATION (DbS v1.3 Structure) ---
-        const MASTER_CATEGORIES = {
-            short_t: ['素面短T', 'Logo短T', '圖案短T'],
-            long_t: ['素面長T', '層次長T'],
-            sweatshirt: ['連帽衛衣', '大學T'],
-            bottom: ['牛仔褲', '工裝褲', '棉褲', '西裝褲', '短褲'],
-            shoes: ['球鞋', '帆布鞋', '皮鞋', '靴子']
-        };
-
-        const SLOTS = [
-            { id: 'short_t', label: '短T' },
-            { id: 'long_t', label: '長T' },
-            { id: 'sweatshirt', label: '衛衣' },
-            { id: 'bottom', label: '下身' },
-            { id: 'shoes', label: '鞋款' }
+        // --- 1. STATIC DATA CONFIGURATION (NO DB) ---
+        // Auto-path Logic from v1.3 reused for v1.5 Catalog
+        const CATEGORIES = [
+            { id: 'short_t', label: 'Short Sleeve', prefix: 'st', price: 'NT$ 1,280', name: 'Essential Cotton Tee' },
+            { id: 'long_t', label: 'Long Sleeve', prefix: 'lt', price: 'NT$ 1,580', name: 'Layering Long Tee' },
+            { id: 'sweatshirt', label: 'Sweatshirt', prefix: 'sw', price: 'NT$ 2,280', name: 'Heavyweight Hoodie' },
+            { id: 'bottom', label: 'Trousers', prefix: 'b', price: 'NT$ 2,980', name: 'Classic Trousers' },
+            { id: 'shoes', label: 'Footwear', prefix: 's', price: 'NT$ 4,580', name: 'Leather Derby' } // Simplified for demo
         ];
 
-        const INVENTORY_TABS = SLOTS.map(s => ({ id: s.id, label: s.label, slots: [s.id] }));
-        const DEFAULT_OUTFIT = { short_t: null, long_t: null, sweatshirt: null, bottom: null, shoes: null };
+        const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
-        const OCCASIONS = [ { id: 'Formal', label: '正式' }, { id: 'Smart', label: '大人' }, { id: 'Casual', label: '休閒' } ];
-        const SEASONS = [ { id: 'Winter', label: '冬季' }, { id: 'Summer', label: '夏季' } ];
+        // --- 2. COMPONENTS ---
 
-        const BASE_COLORS = [
-            { id: 'black', hex: '#1A1A1A', name: '黑' }, { id: 'white', hex: '#FFFFFF', name: '白', border: true },
-            { id: 'gray', hex: '#808080', name: '灰' }, { id: 'navy', hex: '#1E3A8A', name: '深藍' }, { id: 'beige', hex: '#C3B091', name: '大地' }
-        ];
-        
-        const SPECIAL_COLORS = [
-            { id: 'burgundy', hex: '#991b1b', name: '酒紅' }, { id: 'green', hex: '#008000', name: '鮮綠' }, { id: 'denim', hex: '#3B82F6', name: '丹寧' }
-        ];
-
-        // Style Mapping for Random Logic
-        const STYLE_MAP = {
-            '西裝褲': ['Smart', 'Formal'], '皮鞋': ['Smart', 'Formal'],
-            '素面短T': ['Casual', 'Smart'], '素面長T': ['Casual', 'Smart'],
-            '牛仔褲': ['Casual'], '球鞋': ['Casual'], '連帽衛衣': ['Casual']
-        };
-
-        // --- 3. ICONS ---
         const Icon = ({ name, className }) => {
             const icons = {
-                hanger: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2a5 5 0 0 1 4.9 6H7.1a5 5 0 0 1 4.9-6Z"/><path d="M21 21H3V11c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v10Z"/></svg>,
-                grid: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
-                bag: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>,
-                trash: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>,
-                dice: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/></svg>,
-                x: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
-                plus: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14"/></svg>
+                cart: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>,
+                ruler: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2 12h20"/><path d="M4 12v3"/><path d="M8 12v3"/><path d="M12 12v3"/><path d="M16 12v3"/><path d="M20 12v3"/></svg>,
+                x: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
+                arrowRight: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>,
+                dice: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/></svg>
             };
             return icons[name] ? React.cloneElement(icons[name], { className }) : null;
         };
 
-        // --- 4. GHOST ENGINE (Z-Index Optimized) ---
-        const GhostEngine = ({ outfit, occasion, setOccasion, season, setSeason, triggerRandom, onGoToWarehouse }) => {
-            const { short_t, long_t, sweatshirt, bottom, shoes } = outfit;
-            return (
-                <div className="w-full mb-0 flex justify-center items-center animate-fade-in bg-white relative">
-                    <div className="ghost-canvas-container mx-auto relative">
-                        {/* Layer Logic: Shoes > Bottom > ShortT > LongT > Sweatshirt (Visual Stack) */}
-                        {shoes && <img src={shoes.image} className="ghost-layer z-10" alt="Shoes" style={{ transform: 'translateZ(0)' }} />}
-                        
-                        {bottom && <img src={bottom.image} className="ghost-layer z-20" alt="Bottom" />}
-                        
-                        {/* Tops Stacking */}
-                        {short_t && <img src={short_t.image} className="ghost-layer z-30" alt="ShortT" />}
-                        {long_t && <img src={long_t.image} className="ghost-layer z-[35]" alt="LongT" />}
-                        {sweatshirt && <img src={sweatshirt.image} className="ghost-layer z-40" alt="Sweatshirt" />}
-                        
-                        {/* Empty State */}
-                        {(!shoes && !bottom && !short_t && !long_t && !sweatshirt) && (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-auto">
-                                <p className="text-gray-300 text-xs tracking-widest mb-4">SHOWROOM 為空</p>
-                                <button onClick={onGoToWarehouse} className="px-4 py-2 bg-black text-white text-xs font-bold rounded-full shadow-lg hover:scale-105 transition-transform">
-                                    💡 前往倉庫入庫
-                                </button>
-                            </div>
-                        )}
+        // Size Guide Modal
+        const SizeGuideModal = ({ onClose }) => (
+            <div className="modal-overlay animate-fade-in" onClick={onClose}>
+                <div className="modal-content" onClick={e => e.stopPropagation()}>
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="text-sm font-bold uppercase tracking-widest">Size Guide</h3>
+                        <button onClick={onClose}><Icon name="x" className="w-5 h-5 text-gray-400" /></button>
                     </div>
+                    <table className="w-full text-xs text-left text-gray-600">
+                        <thead>
+                            <tr className="border-b">
+                                <th className="py-2">Size</th>
+                                <th className="py-2">Shoulder</th>
+                                <th className="py-2">Chest</th>
+                                <th className="py-2">Length</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr className="border-b"><td className="py-2 font-bold">S</td><td>44</td><td>52</td><td>68</td></tr>
+                            <tr className="border-b"><td className="py-2 font-bold">M</td><td>46</td><td>54</td><td>70</td></tr>
+                            <tr className="border-b"><td className="py-2 font-bold">L</td><td>48</td><td>56</td><td>72</td></tr>
+                            <tr className="border-b"><td className="py-2 font-bold">XL</td><td>50</td><td>58</td><td>74</td></tr>
+                            <tr><td className="py-2 font-bold">XXL</td><td>52</td><td>60</td><td>76</td></tr>
+                        </tbody>
+                    </table>
+                    <p className="text-[10px] text-gray-400 mt-4 text-center">*Unit: cm. Measured flat.</p>
+                </div>
+            </div>
+        );
 
-                    <div className="floating-controls">
-                        <div className="control-group mb-3">
-                            {SEASONS.map(s => (
-                                <button key={s.id} className={`mini-btn ${season === s.id ? 'active' : ''}`} onClick={() => { setSeason(s.id); triggerRandom(occasion, s.id); }}>{s.label.slice(0, 1)}</button>
-                            ))}
+        // Lightbox
+        const Lightbox = ({ src, onClose }) => (
+            <div className="lightbox" onClick={onClose}>
+                <button className="absolute top-6 right-6 p-2 bg-black text-white rounded-full z-10" onClick={onClose}>
+                    <Icon name="x" className="w-6 h-6" />
+                </button>
+                <img src={src} className="max-w-full max-h-full object-contain p-4" />
+            </div>
+        );
+
+        // Product Card Component
+        const ProductCard = ({ item, onZoom, onSizeGuide }) => {
+            const [selectedSize, setSelectedSize] = useState(null);
+            const [visible, setVisible] = useState(true);
+
+            if (!visible) return null;
+
+            return (
+                <div className="product-card">
+                    <div className="relative aspect-[4/5] bg-white cursor-zoom-in" onClick={() => onZoom(item.src)}>
+                        <img 
+                            src={item.src} 
+                            alt={item.name} 
+                            className="w-full h-full object-contain p-4 transition-transform hover:scale-105 duration-700"
+                            onError={() => setVisible(false)} 
+                        />
+                        <div className="absolute bottom-3 right-3 bg-black/5 px-2 py-1 text-[10px] font-bold text-gray-500 rounded uppercase">
+                            DbS Archv.
                         </div>
-                        <div className="control-group">
-                            {OCCASIONS.map(occ => (
-                                <button key={occ.id} className={`mini-btn ${occasion === occ.id ? 'active' : ''}`} onClick={() => { setOccasion(occ.id); triggerRandom(occ.id, season); }}>{occ.label.slice(0, 2)}</button>
-                            ))}
+                    </div>
+                    
+                    <div className="p-5">
+                        <div className="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 className="text-sm font-bold text-black uppercase tracking-wide">{item.name}</h3>
+                                <p className="text-xs text-gray-500 mt-0.5">{item.catLabel} - {item.id}</p>
+                            </div>
+                            <span className="text-sm font-semibold">{item.price}</span>
                         </div>
+
+                        <div className="h-px w-full bg-gray-100 my-4"></div>
+
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex gap-2">
+                                {SIZES.map(s => (
+                                    <button 
+                                        key={s} 
+                                        onClick={() => setSelectedSize(s)}
+                                        className={`size-btn ${selectedSize === s ? 'active' : ''}`}
+                                    >
+                                        {s}
+                                    </button>
+                                ))}
+                            </div>
+                            <button onClick={onSizeGuide} className="text-[10px] text-gray-400 underline hover:text-black flex items-center gap-1">
+                                <Icon name="ruler" className="w-3 h-3" /> Guide
+                            </button>
+                        </div>
+
+                        <button 
+                            className="w-full py-3 bg-black text-white text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+                            onClick={() => alert(`Order Request Sent:\n${item.name}\nSize: ${selectedSize || 'Not Selected'}`)}
+                        >
+                            <span>Start Order</span>
+                            <Icon name="arrowRight" className="w-3 h-3" />
+                        </button>
                     </div>
                 </div>
             );
         };
 
-        // --- 5. MAIN APPLICATION ---
+        // --- 3. MAIN APP ---
         const App = () => {
-            const [wardrobe, setWardrobe] = useState([]);
-            const [outfit, setOutfit] = useState(DEFAULT_OUTFIT);
-            const [activeTab, setActiveTab] = useState('styling');
+            const [activeTab, setActiveTab] = useState('new');
+            const [zoomItem, setZoomItem] = useState(null);
+            const [showSizeGuide, setShowSizeGuide] = useState(false);
             
-            // Warehouse State
-            const [whSlot, setWhSlot] = useState('short_t');
-            const [whColor, setWhColor] = useState('black');
-            const [whCategory, setWhCategory] = useState(MASTER_CATEGORIES['short_t'][0]);
+            // Random styling state
+            const [outfit, setOutfit] = useState({ short_t: null, long_t: null, sweatshirt: null, bottom: null, shoes: null });
 
-            // Load Data
-            const loadData = async () => {
-                try {
-                    const items = await dbHelper.getAllItems();
-                    // Patch items if needed
-                    const patchedItems = items.map(item => ({ ...item, style: STYLE_MAP[item.category] || ['Casual'] }));
-                    setWardrobe(patchedItems);
-                } catch (e) { console.error("DB Load Failed:", e); }
-            };
+            // Generate Static Catalog (Max 15 items per category to be safe)
+            const catalog = useMemo(() => {
+                let items = [];
+                CATEGORIES.forEach(cat => {
+                    // Try to generate 15 potential paths. 
+                    // The ProductCard's onError will hide the ones that don't exist.
+                    for(let i=1; i<=15; i++) {
+                        // Special handling for shoes mix
+                        let src = '';
+                        if(cat.id === 'shoes') {
+                           if(i <= 5) src = `s0${i}.png`;
+                           else if(i <= 10) src = `w${i-5}.png`;
+                           else src = `x0${i-10}.png`;
+                        } else {
+                            src = `${cat.prefix}${i}.png`;
+                        }
 
-            useEffect(() => { loadData(); }, []);
+                        items.push({
+                            uid: `${cat.id}-${i}`,
+                            id: `#${cat.prefix.toUpperCase()}${String(i).padStart(3, '0')}`,
+                            catId: cat.id,
+                            catLabel: cat.label,
+                            name: cat.name,
+                            price: cat.price,
+                            src: `./${src}`
+                        });
+                    }
+                });
+                return items;
+            }, []);
 
-            const handleAddItem = async (item) => {
-                const styles = STYLE_MAP[whCategory] || ['Casual'];
-                const newItem = {
-                    slot: whSlot, image: `./${item.src}`, category: whCategory, 
-                    color: whColor, style: styles, createdAt: Date.now()
+            // Random Styling Logic
+            const handleRandom = useCallback(() => {
+                const getRand = (catId) => {
+                    const pool = catalog.filter(i => i.catId === catId);
+                    // Filter out items that might not exist? 
+                    // In a static setup without DB, we randomly pick and hope, 
+                    // or we rely on the user to have valid files.
+                    // For demo, we just pick from the generated list.
+                    return pool[Math.floor(Math.random() * pool.length)];
                 };
-                try {
-                    await dbHelper.addItem(newItem);
-                    await loadData();
-                    alert("單品已入庫 (Ready)");
-                } catch (e) { alert("儲存失敗"); }
-            };
 
-            const handleDeleteItem = async (id) => {
-                if(!confirm("確定移除此單品？")) return;
-                await dbHelper.deleteItem(id);
-                loadData();
-                setOutfit(prev => {
-                    const next = { ...prev };
-                    Object.keys(next).forEach(k => { if (next[k]?.id === id) next[k] = null; });
-                    return next;
+                setOutfit({
+                    short_t: getRand('short_t'),
+                    long_t: Math.random() > 0.7 ? getRand('long_t') : null, // 30% chance layer
+                    sweatshirt: Math.random() > 0.5 ? getRand('sweatshirt') : null, // 50% chance layer
+                    bottom: getRand('bottom'),
+                    shoes: getRand('shoes')
                 });
-            };
-
-            const handleClearSlot = (slot) => setOutfit(prev => ({ ...prev, [slot]: null }));
-            const handleClearAll = () => setOutfit(DEFAULT_OUTFIT);
-
-            const handleRandom = useCallback((targetOccasion = occasion, targetSeason = season) => {
-                const newOutfit = { ...outfit };
-                SLOTS.forEach(s => {
-                    const slot = s.id;
-                    let candidates = wardrobe.filter(item => item.slot === slot);
-                    
-                    // Season Logic
-                    if (targetSeason === 'Summer' && slot === 'sweatshirt') candidates = [];
-                    
-                    if (candidates.length > 0) newOutfit[slot] = candidates[Math.floor(Math.random() * candidates.length)];
-                    else newOutfit[slot] = null;
-                });
-                setOutfit(newOutfit);
-            }, [outfit, wardrobe]);
-
-            // --- AUTO PATH GENERATOR (DbS v1.3 Logic) ---
-            const range = (prefix, count) => Array.from({length: count}, (_, i) => `${prefix}${i+1}.png`);
-            
-            const getWarehouseItems = () => {
-                // v1.3 Automated Prefixes
-                if (whSlot === 'short_t') return range('st', 20).map(src => ({ src, slot: 'short_t' }));
-                if (whSlot === 'long_t') return range('lt', 20).map(src => ({ src, slot: 'long_t' }));
-                if (whSlot === 'sweatshirt') return range('sw', 20).map(src => ({ src, slot: 'sweatshirt' }));
-                if (whSlot === 'bottom') return range('b', 20).map(src => ({ src, slot: 'bottom' }));
-                
-                if (whSlot === 'shoes') {
-                    // Hybrid old logic for shoes: dress(s), leather_sneaker(w), athletic(x)
-                    // Assuming roughly 5 of each for now to keep it simpler, or extend as needed
-                    return [
-                        ...range('s0', 5), 
-                        ...range('w', 5), 
-                        ...range('x0', 5)
-                    ].map(src => ({ src, slot: 'shoes' }));
-                }
-                return [];
-            };
-
-            const handleWhSlotChange = (s) => {
-                setWhSlot(s);
-                if (MASTER_CATEGORIES[s]) setWhCategory(MASTER_CATEGORIES[s][0]);
-            };
+            }, [catalog]);
 
             return (
                 <div className="app-container">
                     {/* Header */}
-                    <div className="px-6 pt-6 pb-2 bg-white border-b border-gray-100 flex justify-between items-center z-10 sticky top-0">
-                        <h1 className="text-lg font-bold tracking-tighter flex items-center gap-2">
+                    <div className="px-6 pt-8 pb-4 bg-[#F9F9F9] z-10">
+                        <h1 className="text-xl font-bold tracking-tighter text-center">
                             DbSSTUDIO 
-                            <span className="bg-black text-white text-[10px] px-2 py-0.5 rounded-full shadow-sm">v1.3</span>
+                            <span className="ml-2 font-light text-sm text-gray-400 tracking-widest">v1.5 ARCHIVE</span>
                         </h1>
                     </div>
 
-                    <div className="content-area bg-gray-50">
+                    {/* Content */}
+                    <div className="content-area px-4 pt-2">
                         
-                        {/* TAB 1: STYLING */}
-                        {activeTab === 'styling' && (
+                        {/* VIEW: NEW ARRIVALS (Catalog) */}
+                        {activeTab === 'new' && (
                             <div className="animate-fade-in">
-                                <GhostEngine 
-                                    outfit={outfit} 
-                                    occasion='Smart' setOccasion={()=>{}}
-                                    season='Winter' setSeason={()=>{}}
-                                    triggerRandom={handleRandom}
-                                    onGoToWarehouse={() => setActiveTab('add')}
-                                />
+                                <div className="mb-6 text-center">
+                                    <h2 className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">Season 2025</h2>
+                                    <p className="text-[10px] text-gray-300">Ready-to-Wear Collection</p>
+                                </div>
                                 
-                                <div className="px-6 mt-4 mb-4">
-                                    <div className="grid grid-cols-5 gap-2 mb-4">
-                                        {SLOTS.map(s => (
-                                            <div key={s.id} className="relative group">
-                                                <div className={`aspect-square rounded-xl border flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden relative ${outfit[s.id] ? 'bg-white border-black' : 'bg-gray-100 border-dashed border-gray-300'}`}>
-                                                    {outfit[s.id] ? (
-                                                        <div className={`w-full h-full overflow-hidden ${s.id === 'shoes' ? '' : 'p-1 flex items-center justify-center'}`}>
-                                                            <img 
-                                                                src={outfit[s.id].image} 
-                                                                className="w-full h-full"
-                                                                style={s.id === 'shoes' 
-                                                                    ? { width: '100%', height: '100%', objectFit: 'contain', transform: 'scale(3.8) translateZ(0)', transformOrigin: 'bottom center' } 
-                                                                    : { objectFit: 'contain' }
-                                                                }
-                                                                alt={s.label}
-                                                            />
-                                                        </div>
-                                                    ) : (
-                                                        <span className="text-[9px] font-bold text-gray-400">{s.label}</span>
-                                                    )}
-                                                </div>
-                                                {outfit[s.id] && (
-                                                    <button onClick={() => handleClearSlot(s.id)} className="absolute -top-2 -right-2 bg-white border border-gray-200 text-gray-400 rounded-full p-1 shadow hover:text-red-500 z-20"><Icon name="x" className="w-2 h-2" /></button>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="flex gap-3">
-                                        <button onClick={handleClearAll} className="flex-1 py-3 bg-white border border-gray-200 text-gray-500 text-xs font-bold tracking-widest uppercase rounded-xl hover:bg-gray-50 flex items-center justify-center gap-2 active:scale-95 transition-transform"><Icon name="trash" className="w-4 h-4" /> 重置</button>
-                                        <button onClick={() => handleRandom('Smart', 'Winter')} className="flex-[2] py-3 bg-black text-white text-xs font-bold tracking-widest uppercase rounded-xl hover:bg-gray-900 shadow-lg flex items-center justify-center gap-2 transition-transform active:scale-95"><Icon name="dice" className="w-4 h-4" /> DbS 智慧選</button>
-                                    </div>
+                                <div>
+                                    {catalog.map(item => (
+                                        <ProductCard 
+                                            key={item.uid} 
+                                            item={item} 
+                                            onZoom={setZoomItem} 
+                                            onSizeGuide={() => setShowSizeGuide(true)}
+                                        />
+                                    ))}
+                                </div>
+                                <div className="text-center py-10 text-[10px] text-gray-300 uppercase tracking-widest">
+                                    End of Collection
                                 </div>
                             </div>
                         )}
 
-                        {/* TAB 2: CLOSET */}
-                        {activeTab === 'closet' && (
-                            <div className="p-6 animate-fade-in min-h-full bg-white">
-                                <h2 className="text-xl font-bold mb-4">我的衣櫥</h2>
-                                <div className="flex gap-2 mb-6 overflow-x-auto no-scrollbar">
-                                    {INVENTORY_TABS.map(tab => (
-                                        <button key={tab.id} onClick={() => setInventoryTab(tab.id)} className={`px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${inventoryTab === tab.id ? 'bg-black text-white' : 'bg-gray-100 text-gray-400'}`}>{tab.label}</button>
-                                    ))}
-                                </div>
-                                <div className="grid grid-cols-3 gap-2">
-                                    {wardrobe.filter(item => INVENTORY_TABS.find(t => t.id === inventoryTab)?.slots.includes(item.slot)).map(item => (
-                                        <div key={item.id} onClick={() => { setOutfit(prev => ({...prev, [item.slot]: item})); setActiveTab('styling'); }} className="dense-card cursor-pointer overflow-hidden relative group">
-                                            <img 
-                                                src={item.image} 
-                                                alt={item.category}
-                                                style={item.slot === 'shoes' 
-                                                    ? { width: '100%', height: '100%', objectFit: 'contain', transform: 'scale(3.5)', transformOrigin: 'bottom center', padding: 0 } 
-                                                    : {}}
-                                            />
-                                            <div className="absolute bottom-1 right-1 w-2 h-2 rounded-full border border-gray-100 shadow-sm" style={{ background: [...BASE_COLORS, ...SPECIAL_COLORS].find(c => c.id === item.color)?.hex || '#000' }}></div>
-                                            <button onClick={(e) => { e.stopPropagation(); handleDeleteItem(item.id); }} className="absolute top-1 right-1 p-1 bg-white/80 rounded-full text-gray-300 hover:text-red-500"><Icon name="trash" className="w-3 h-3" /></button>
+                        {/* VIEW: STYLING (Ghost Engine Static) */}
+                        {activeTab === 'style' && (
+                            <div className="animate-fade-in flex flex-col h-full">
+                                <div className="ghost-canvas-container shadow-sm border border-gray-100">
+                                    {outfit.shoes && <img src={outfit.shoes.src} className="ghost-layer z-10" onError={(e)=>e.target.style.display='none'} />}
+                                    {outfit.bottom && <img src={outfit.bottom.src} className="ghost-layer z-20" onError={(e)=>e.target.style.display='none'} />}
+                                    {outfit.short_t && <img src={outfit.short_t.src} className="ghost-layer z-30" onError={(e)=>e.target.style.display='none'} />}
+                                    {outfit.long_t && <img src={outfit.long_t.src} className="ghost-layer z-[35]" onError={(e)=>e.target.style.display='none'} />}
+                                    {outfit.sweatshirt && <img src={outfit.sweatshirt.src} className="ghost-layer z-40" onError={(e)=>e.target.style.display='none'} />}
+                                    
+                                    {(!outfit.bottom && !outfit.shoes) && (
+                                        <div className="absolute inset-0 flex items-center justify-center text-gray-300 text-xs tracking-widest uppercase">
+                                            Tap Generate to Start
                                         </div>
-                                    ))}
+                                    )}
                                 </div>
-                                {wardrobe.length === 0 && <div className="text-center py-12 text-gray-300 text-xs">衣櫥空空如也</div>}
+
+                                <div className="mt-6 px-4">
+                                    <button 
+                                        onClick={handleRandom}
+                                        className="w-full py-4 bg-black text-white text-xs font-bold uppercase tracking-[0.2em] hover:bg-gray-900 transition-all flex items-center justify-center gap-3 shadow-lg"
+                                    >
+                                        <Icon name="dice" className="w-4 h-4" />
+                                        Generate Style
+                                    </button>
+                                    <p className="text-center text-[10px] text-gray-400 mt-4 leading-relaxed">
+                                        AI-Powered Styling Suggestions based on current inventory.<br/>
+                                        Mix and match effectively.
+                                    </p>
+                                </div>
                             </div>
                         )}
 
-                        {/* TAB 3: WAREHOUSE (Auto Generated) */}
-                        {activeTab === 'add' && (
-                            <div className="p-6 animate-fade-in bg-white min-h-full">
-                                <h2 className="text-xl font-bold mb-4">單品倉庫</h2>
-                                <div className="flex gap-2 overflow-x-auto no-scrollbar mb-4 pb-1">
-                                    {SLOTS.map(s => (
-                                        <button key={s.id} onClick={() => handleWhSlotChange(s.id)} className={`px-4 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap border transition-colors ${whSlot === s.id ? 'bg-black text-white border-black' : 'bg-white text-gray-500 border-gray-200'}`}>{s.label}</button>
-                                    ))}
-                                </div>
-
-                                <div className="flex gap-2 overflow-x-auto no-scrollbar mb-4 pb-1">
-                                    {MASTER_CATEGORIES[whSlot]?.map(cat => (
-                                        <button key={cat} onClick={() => setWhCategory(cat)} className={`cat-pill ${whCategory === cat ? 'active' : 'inactive'}`}>{cat}</button>
-                                    ))}
-                                </div>
-
-                                <div className="flex gap-3 overflow-x-auto no-scrollbar mb-6 py-1">
-                                    {[...BASE_COLORS, ...SPECIAL_COLORS].map(c => (
-                                        <div key={c.id} className="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0" onClick={() => setWhColor(c.id)}>
-                                            <div className={`w-6 h-6 rounded-full transition-all shadow-sm ${whColor === c.id ? 'ring-2 ring-offset-2 ring-black scale-110' : 'hover:scale-105'}`} style={{ background: c.hex, border: c.border ? '1px solid #e5e7eb' : 'none' }}></div>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-3 pb-20">
-                                    {getWarehouseItems().map((item, idx) => (
-                                        <div key={idx} onClick={() => handleAddItem(item)} className="warehouse-item relative group bg-white shadow-sm hover:shadow-md overflow-hidden">
-                                            <img 
-                                                src={`./${item.src}`} 
-                                                alt="item" 
-                                                style={whSlot === 'shoes' 
-                                                    ? { width: '100%', height: '100%', objectFit: 'contain', transform: 'scale(3.5)', transformOrigin: 'bottom center', padding: 0 } 
-                                                    : {}}
-                                            />
-                                            <div className="absolute inset-0 flex items-center justify-center bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <span className="bg-black text-white text-[10px] px-2 py-1 rounded-full font-bold">入庫</span>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                        {/* VIEW: CONTACT */}
+                        {activeTab === 'contact' && (
+                            <div className="animate-fade-in p-6 bg-white min-h-[50vh] flex flex-col items-center justify-center text-center border border-gray-100 mt-4">
+                                <h2 className="text-lg font-bold mb-2">DbSSTUDIO</h2>
+                                <p className="text-xs text-gray-500 mb-6 tracking-widest">DIGITAL SHOWROOM</p>
+                                
+                                <div className="w-8 h-px bg-black mb-6"></div>
+                                
+                                <p className="text-xs text-gray-600 leading-7">
+                                    Taipei, Taiwan<br/>
+                                    Mon - Fri: 10am - 7pm<br/>
+                                    inquiry@dbsstudio.com
+                                </p>
+                                
+                                <button className="mt-8 px-8 py-3 border border-black text-xs font-bold uppercase hover:bg-black hover:text-white transition-colors">
+                                    Contact Support
+                                </button>
                             </div>
                         )}
+
                     </div>
 
-                    {/* Bottom Navigation */}
+                    {/* Navigation */}
                     <div className="bottom-nav">
-                        <div onClick={() => setActiveTab('styling')} className={`nav-item ${activeTab === 'styling' ? 'active' : ''}`}>
-                            <Icon name="hanger" className="w-6 h-6" />
-                            <span>搭配</span>
+                        <div onClick={() => setActiveTab('new')} className={`nav-item ${activeTab === 'new' ? 'active' : ''}`}>
+                            Collection
                         </div>
-                        <div onClick={() => setActiveTab('closet')} className={`nav-item ${activeTab === 'closet' ? 'active' : ''}`}>
-                            <Icon name="grid" className="w-6 h-6" />
-                            <span>衣櫥</span>
+                        <div onClick={() => setActiveTab('style')} className={`nav-item ${activeTab === 'style' ? 'active' : ''}`}>
+                            Styling
                         </div>
-                        <div onClick={() => setActiveTab('add')} className={`nav-item ${activeTab === 'add' ? 'active' : ''}`}>
-                            <Icon name="plus" className="w-6 h-6" />
-                            <span>倉庫</span>
+                        <div onClick={() => setActiveTab('contact')} className={`nav-item ${activeTab === 'contact' ? 'active' : ''}`}>
+                            Contact
                         </div>
                     </div>
+
+                    {/* Modals */}
+                    {zoomItem && <Lightbox src={zoomItem} onClose={() => setZoomItem(null)} />}
+                    {showSizeGuide && <SizeGuideModal onClose={() => setShowSizeGuide(false)} />}
                 </div>
             );
         };
