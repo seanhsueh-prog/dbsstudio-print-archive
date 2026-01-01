@@ -500,4 +500,11 @@
 
                     {zoomItem && <Lightbox src={zoomItem} onClose={() => setZoomItem(null)} />}
                     {sizeGuideCategory && <SizeGuideModal category={sizeGuideCategory} onClose={() => setSizeGuideCategory(null)} />}
-                    {showCart && <InquiryC
+                    {showCart && <InquiryCartModal list={inquiryList} onRemove={removeFromInquiry} onClose={() => setShowCart(false)} />}
+                </div>
+            );
+        };
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
