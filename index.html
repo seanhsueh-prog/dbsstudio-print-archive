@@ -1,14 +1,14 @@
-<!-- DbSSTUDIO-Showroom.v2.1.html -->
+<!-- DbSSTUDIO-Showroom.v2.2.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DbSSTUDIO v2.1 - Professional App Archive 2026</title>
+    <title>DbSSTUDIO v2.2 - Ultimate Zoom Archive</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [DbSSTUDIO v2.1 - App-Like Experience] */
+        /* [DbSSTUDIO v2.2 - Ultimate Zoom / App Experience] */
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             -webkit-font-smoothing: antialiased; 
@@ -16,7 +16,7 @@
             color: #111; 
             margin: 0;
             height: 100vh;
-            overflow: hidden; /* Lock body scroll */
+            overflow: hidden; 
             display: flex;
             justify-content: center; 
             align-items: flex-start;
@@ -57,7 +57,7 @@
         .size-btn:hover { border-color: #000; color: #000; }
         .size-btn.active { background: #000; color: #fff; border-color: #000; }
 
-        /* Ghost Engine - Maximized */
+        /* Ghost Engine */
         .ghost-canvas-container {
             position: relative; width: 100%; aspect-ratio: 3.5 / 5; 
             background-color: #fff; overflow: hidden; margin-bottom: 12px;
@@ -84,23 +84,34 @@
         }
         .nav-item.active { color: #000; }
         
-        /* v2.1 Critical Fix - Shocking Lightbox */
+        /* v2.2 Ultimate Zoom Lightbox */
         .lightbox-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.99); 
             z-index: 99999; /* Supreme Layer */
-            display: flex; align-items: center; justify-content: center;
             animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            cursor: zoom-out;
+            overflow: auto; /* Enable Scrolling for Zoomed Image */
+            -webkit-overflow-scrolling: touch;
         }
+        
+        .lightbox-scroll-wrapper {
+            min-width: 100%;
+            min-height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align top to see shirt details */
+            padding-top: 5vh;
+            padding-bottom: 10vh;
+        }
+
         .lightbox-img {
-            width: 95vw !important; 
+            /* Force Zoom Effect */
+            width: 150vw !important; 
+            max-width: none !important;
             height: auto !important;
-            max-height: 90vh !important;
-            object-fit: contain !important;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.15);
-            transform: translateZ(0);
-            cursor: default; /* Prevent closing on click */
+            transform: translateY(-5%); /* Shift up to hide empty foot space */
+            box-shadow: 0 40px 80px rgba(0,0,0,0.1);
+            cursor: grab;
         }
 
         /* Modal */
@@ -208,23 +219,24 @@
             );
         };
 
-        // 2. Lightbox (v2.1 Fixed - The Shocking Zoom)
+        // 2. Lightbox (v2.2 Ultimate Zoom)
         const Lightbox = ({ src, onClose }) => {
-            // High Z-Index fixed container
             return (
                 <div className="lightbox-container" onClick={onClose}>
-                    <button className="absolute top-6 right-6 p-4 bg-black text-white rounded-full z-[100000] hover:scale-110 transition-transform shadow-lg" onClick={onClose}>
+                    <button className="absolute top-6 right-6 p-4 bg-black text-white rounded-full z-[100000] hover:scale-110 transition-transform shadow-lg sticky top-6 float-right mr-6 mt-6" onClick={onClose}>
                         <Icon name="x" className="w-6 h-6" />
                     </button>
-                    <img 
-                        src={src} 
-                        className="lightbox-img" 
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation(); // Critical Fix: Prevent close on image click
-                        }} 
-                        alt="Detail Zoom"
-                    />
+                    <div className="lightbox-scroll-wrapper">
+                        <img 
+                            src={src} 
+                            className="lightbox-img" 
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation(); 
+                            }} 
+                            alt="Detail Zoom"
+                        />
+                    </div>
                 </div>
             );
         };
@@ -370,7 +382,7 @@
                         let src = '';
                         let subType = '';
                         
-                        // v2.1 Shoes Logic: s0x, w0x, x0x
+                        // v2.2 Shoes Logic: s0x, w0x, x0x
                         if(cat.id === 'shoes') {
                            if(i <= 5) { src = `s0${i}.png`; subType = 'Formal'; }
                            else if(i <= 10) { src = `w${i-5}.png`; subType = 'Casual'; }
@@ -433,7 +445,7 @@
                 <div className="app-container">
                     <div className="px-6 pt-10 pb-6 bg-[#F9F9F9] z-10 flex flex-col items-center">
                         <h1 className="text-xl font-extrabold tracking-tighter text-center flex items-center gap-2">DbSSTUDIO</h1>
-                        <span className="text-[10px] text-gray-400 tracking-[0.2em] uppercase mt-1">v2.1 Professional App Archive 2026</span>
+                        <span className="text-[10px] text-gray-400 tracking-[0.2em] uppercase mt-1">v2.2 Ultimate Zoom Archive</span>
                     </div>
 
                     <div className="content-area px-5 pt-2">
