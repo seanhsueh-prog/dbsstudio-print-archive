@@ -1,14 +1,14 @@
-<!-- DbSSTUDIO-Showroom.v1.7.html -->
+<!-- DbSSTUDIO-Showroom.v1.8.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DbSSTUDIO v1.7 - Elite Archive 2026</title>
+    <title>DbSSTUDIO v1.8 - Professional Archive 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [DbSSTUDIO v1.7 - Elite Archive] */
+        /* [DbSSTUDIO v1.8 - Professional Archive / Commercial] */
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             -webkit-font-smoothing: antialiased; 
@@ -38,7 +38,7 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fade-in { animation: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-fade-in { animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
         /* Product Card */
         .product-card {
@@ -55,10 +55,10 @@
         .size-btn:hover { border-color: #000; color: #000; }
         .size-btn.active { background: #000; color: #fff; border-color: #000; }
 
-        /* Ghost Engine */
+        /* Ghost Engine - Maximized */
         .ghost-canvas-container {
-            position: relative; width: 100%; aspect-ratio: 4 / 5; 
-            background-color: #fff; overflow: hidden;
+            position: relative; width: 100%; aspect-ratio: 3.5 / 5; 
+            background-color: #fff; overflow: hidden; margin-bottom: 12px;
         }
         .ghost-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -89,6 +89,12 @@
             display: flex; align-items: center; justify-content: center;
             animation: fade-in 0.2s;
         }
+        /* v1.8 Lightbox Size Increase */
+        .lightbox img {
+            max-height: 85vh; width: auto; max-width: 95vw;
+            object-fit: contain;
+        }
+
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(2px);
@@ -96,14 +102,29 @@
             padding: 20px;
         }
         .modal-content {
-            background: #fff; width: 100%; max-width: 340px; padding: 24px;
+            background: #fff; width: 100%; max-width: 360px; padding: 24px;
             border-radius: 2px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            max-height: 80vh; overflow-y: auto;
         }
 
-        .btn-line { background-color: #06C755; color: white; transition: opacity 0.2s; }
-        .btn-line:hover { opacity: 0.9; }
         .btn-try { background-color: #fff; border: 1px solid #000; color: #000; transition: all 0.2s; }
         .btn-try:hover { background-color: #f5f5f5; }
+
+        /* Floating Cart */
+        .floating-cart {
+            position: absolute; bottom: 100px; right: 20px;
+            width: 50px; height: 50px; background: #000; color: #fff;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 40;
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .floating-cart:active { transform: scale(0.9); }
+        .cart-badge {
+            position: absolute; top: -2px; right: -2px;
+            background: #FF3B30; color: #fff; font-size: 10px; font-weight: bold;
+            width: 18px; height: 18px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -125,19 +146,21 @@
             { id: 'shoes', label: '鞋履系列', prefix: 's', name: 'Leather Derby' }
         ];
         const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
-        const LINE_ID = "@dbsstudio"; // Placeholder Line ID
+        const LINE_ID = "@dbsstudio"; 
 
         // --- ICONS ---
         const Icon = ({ name, className }) => {
             const icons = {
                 ruler: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2 12h20"/><path d="M4 12v3"/><path d="M8 12v3"/><path d="M12 12v3"/><path d="M16 12v3"/><path d="M20 12v3"/></svg>,
                 x: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
-                arrowRight: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>,
+                plus: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
                 dice: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/></svg>,
                 chat: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
                 home: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
                 hanger: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2a5 5 0 0 1 4.9 6H7.1a5 5 0 0 1 4.9-6Z"/><path d="M21 21H3V11c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v10Z"/></svg>,
-                eye: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                eye: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
+                cart: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>,
+                trash: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             };
             return icons[name] ? React.cloneElement(icons[name], { className }) : null;
         };
@@ -179,23 +202,77 @@
                 <button className="absolute top-6 right-6 p-2 bg-black text-white rounded-full z-10 hover:scale-110 transition-transform" onClick={onClose}>
                     <Icon name="x" className="w-6 h-6" />
                 </button>
-                <img src={src} className="max-w-full max-h-full object-contain p-2" />
+                <img src={src} />
             </div>
         );
 
-        const ProductCard = ({ item, onZoom, onSizeGuide, onTryOn }) => {
+        // v1.8 Inquiry Cart Modal
+        const InquiryCartModal = ({ list, onRemove, onClose }) => {
+            const handleCheckout = () => {
+                if (list.length === 0) return;
+                let msg = "您好，我想諮詢 DbSSTUDIO 2026 商品：\n";
+                list.forEach((item, idx) => {
+                    msg += `${idx + 1}. ${item.name} (${item.id}) / ${item.size}\n`;
+                });
+                msg += "\n請協助確認庫存，謝謝。";
+                window.location.href = `https://line.me/R/oaMessage/${LINE_ID}/?${encodeURIComponent(msg)}`;
+            };
+
+            return (
+                <div className="modal-overlay animate-fade-in" onClick={onClose}>
+                    <div className="modal-content flex flex-col max-h-[80vh]" onClick={e => e.stopPropagation()}>
+                        <div className="flex justify-between items-center mb-6 border-b pb-4">
+                            <h3 className="text-sm font-bold uppercase tracking-widest">詢問清單 ({list.length})</h3>
+                            <button onClick={onClose}><Icon name="x" className="w-5 h-5 text-gray-400 hover:text-black" /></button>
+                        </div>
+                        
+                        <div className="flex-1 overflow-y-auto mb-6 pr-2">
+                            {list.length === 0 ? (
+                                <p className="text-center text-xs text-gray-400 py-8">清單目前是空的</p>
+                            ) : (
+                                <div className="space-y-4">
+                                    {list.map((item, idx) => (
+                                        <div key={idx} className="flex gap-3 items-start border-b border-gray-50 pb-3">
+                                            <img src={item.src} className="w-12 h-16 object-contain border border-gray-100 bg-gray-50" />
+                                            <div className="flex-1">
+                                                <p className="text-xs font-bold">{item.name}</p>
+                                                <p className="text-[10px] text-gray-400">{item.id} / 尺寸: {item.size}</p>
+                                            </div>
+                                            <button onClick={() => onRemove(idx)} className="text-gray-300 hover:text-red-500">
+                                                <Icon name="trash" className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <button 
+                            onClick={handleCheckout}
+                            disabled={list.length === 0}
+                            className={`w-full py-3.5 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 ${list.length > 0 ? 'bg-[#06C755] text-white hover:opacity-90' : 'bg-gray-100 text-gray-400'}`}
+                        >
+                            <span>確認並開啟 Line</span>
+                            <Icon name="chat" className="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const ProductCard = ({ item, onZoom, onSizeGuide, onTryOn, onAddToInquiry }) => {
             const [selectedSize, setSelectedSize] = useState(null);
             const [visible, setVisible] = useState(true);
 
             if (!visible) return null;
 
-            const handleOrder = () => {
+            const handleAdd = () => {
                 if (!selectedSize) {
-                    alert("請先選擇尺寸 (Please select a size)");
+                    alert("請先選擇尺寸");
                     return;
                 }
-                const msg = encodeURIComponent(`您好，我想諮詢 DbSSTUDIO 2026 商品：${item.name} / ${item.id} / ${selectedSize}`);
-                window.location.href = `https://line.me/R/oaMessage/${LINE_ID}/?${msg}`;
+                onAddToInquiry(item, selectedSize);
+                alert("已加入詢問清單");
             };
 
             return (
@@ -234,9 +311,9 @@
                             </button>
                             <button 
                                 className={`flex-[1.5] py-3.5 text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${selectedSize ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
-                                onClick={handleOrder}
+                                onClick={handleAdd}
                             >
-                                <span>立即訂購</span><Icon name="arrowRight" className="w-3 h-3" />
+                                <span>加入詢問清單</span><Icon name="plus" className="w-3 h-3" />
                             </button>
                         </div>
                     </div>
@@ -250,8 +327,11 @@
             const [zoomItem, setZoomItem] = useState(null);
             const [sizeGuideCategory, setSizeGuideCategory] = useState(null);
             const [outfit, setOutfit] = useState({ short_t: null, long_t: null, sweatshirt: null, bottom: null, shoes: null });
+            
+            // v1.8 Inquiry List State
+            const [inquiryList, setInquiryList] = useState([]);
+            const [showCart, setShowCart] = useState(false);
 
-            // Catalog Data Generation
             const catalog = useMemo(() => {
                 let items = [];
                 CATEGORIES.forEach(cat => {
@@ -268,47 +348,48 @@
                 return items;
             }, []);
 
-            // Helper to get random item
             const getRand = useCallback((catId) => {
                 const pool = catalog.filter(i => i.catId === catId);
                 return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
             }, [catalog]);
 
-            // Try It On Logic
             const handleTryOn = (item) => {
-                // Clear other top layers to focus on the selected one
                 setOutfit(prev => ({
                     ...prev,
                     short_t: item.catId === 'short_t' ? item : null,
                     long_t: item.catId === 'long_t' ? item : null,
                     sweatshirt: item.catId === 'sweatshirt' ? item : null,
-                    // Auto-fill bottom/shoes if empty
                     bottom: prev.bottom || getRand('bottom'),
                     shoes: prev.shoes || getRand('shoes')
                 }));
                 setActiveTab('style');
             };
 
-            // Smart Pick Logic (Lock Top, Random Bottom/Shoes)
             const handleSmartPick = () => {
                 const hasTop = outfit.short_t || outfit.long_t || outfit.sweatshirt;
                 setOutfit(prev => ({
                     ...prev,
-                    // If a top exists, keep it. If not, randomize tops.
                     short_t: hasTop ? prev.short_t : getRand('short_t'),
                     long_t: hasTop ? prev.long_t : (Math.random() > 0.7 ? getRand('long_t') : null),
                     sweatshirt: hasTop ? prev.sweatshirt : null,
-                    // Always randomize bottom & shoes
                     bottom: getRand('bottom'),
                     shoes: getRand('shoes')
                 }));
+            };
+
+            // Inquiry Handlers
+            const addToInquiry = (item, size) => {
+                setInquiryList(prev => [...prev, { ...item, size }]);
+            };
+            const removeFromInquiry = (idx) => {
+                setInquiryList(prev => prev.filter((_, i) => i !== idx));
             };
 
             return (
                 <div className="app-container">
                     <div className="px-6 pt-10 pb-6 bg-[#F9F9F9] z-10 flex flex-col items-center">
                         <h1 className="text-xl font-extrabold tracking-tighter text-center flex items-center gap-2">DbSSTUDIO</h1>
-                        <span className="text-[10px] text-gray-400 tracking-[0.2em] uppercase mt-1">v1.7 Elite Archive 2026</span>
+                        <span className="text-[10px] text-gray-400 tracking-[0.2em] uppercase mt-1">v1.8 Professional Archive 2026</span>
                     </div>
 
                     <div className="content-area px-5 pt-2">
@@ -319,9 +400,15 @@
                                     <p className="text-[10px] text-gray-400 font-light tracking-wide">Tops Collection</p>
                                 </div>
                                 <div>
-                                    {/* Filter: Only Tops */}
                                     {catalog.filter(i => ['short_t', 'long_t', 'sweatshirt'].includes(i.catId)).map(item => (
-                                        <ProductCard key={item.uid} item={item} onZoom={setZoomItem} onSizeGuide={setSizeGuideCategory} onTryOn={handleTryOn} />
+                                        <ProductCard 
+                                            key={item.uid} 
+                                            item={item} 
+                                            onZoom={setZoomItem} 
+                                            onSizeGuide={setSizeGuideCategory} 
+                                            onTryOn={handleTryOn} 
+                                            onAddToInquiry={addToInquiry}
+                                        />
                                     ))}
                                 </div>
                                 <div className="text-center py-12 text-[10px] text-gray-300 uppercase tracking-widest border-t border-gray-100 mt-4">- End of Collection -</div>
@@ -330,7 +417,8 @@
 
                         {activeTab === 'style' && (
                             <div className="animate-fade-in flex flex-col h-full">
-                                <div className="ghost-canvas-container bg-white shadow-sm border border-gray-100 mb-6">
+                                {/* Maximized Ghost Engine */}
+                                <div className="ghost-canvas-container bg-white shadow-sm border border-gray-100 mb-4">
                                     {outfit.shoes && <img src={outfit.shoes.src} className="ghost-layer z-10" onError={(e)=>e.target.style.display='none'} />}
                                     {outfit.bottom && <img src={outfit.bottom.src} className="ghost-layer z-20" onError={(e)=>e.target.style.display='none'} />}
                                     {outfit.short_t && <img src={outfit.short_t.src} className="ghost-layer z-30" onError={(e)=>e.target.style.display='none'} />}
@@ -343,16 +431,11 @@
                                         </div>
                                     )}
                                 </div>
-                                <div className="px-2">
+                                <div className="px-1">
                                     <button onClick={handleSmartPick} className="w-full py-4 bg-black text-white text-xs font-bold uppercase tracking-[0.2em] hover:bg-gray-800 transition-all flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform active:scale-98">
                                         <Icon name="dice" className="w-4 h-4" /> 
                                         { (outfit.short_t || outfit.long_t || outfit.sweatshirt) ? "鎖定上身．切換搭配" : "DBS 智慧選 (Shuffle)" }
                                     </button>
-                                    <p className="text-center text-[10px] text-gray-400 mt-6 leading-relaxed px-4">
-                                        { (outfit.short_t || outfit.long_t || outfit.sweatshirt) 
-                                            ? "已鎖定目前上衣，僅更換下身與鞋款組合。" 
-                                            : "系統將根據現有庫存進行隨機演算搭配。" }
-                                    </p>
                                 </div>
                             </div>
                         )}
@@ -375,6 +458,14 @@
                         )}
                     </div>
 
+                    {/* Inquiry Cart Floating Button */}
+                    {inquiryList.length > 0 && (
+                        <div className="floating-cart animate-fade-in" onClick={() => setShowCart(true)}>
+                            <Icon name="cart" className="w-5 h-5" />
+                            <div className="cart-badge">{inquiryList.length}</div>
+                        </div>
+                    )}
+
                     <div className="bottom-nav">
                         <div onClick={() => setActiveTab('new')} className={`nav-item ${activeTab === 'new' ? 'active' : ''}`}><Icon name="home" className="w-5 h-5" /><span>本季新品</span></div>
                         <div onClick={() => setActiveTab('style')} className={`nav-item ${activeTab === 'style' ? 'active' : ''}`}><Icon name="hanger" className="w-5 h-5" /><span>風格搭配</span></div>
@@ -383,6 +474,7 @@
 
                     {zoomItem && <Lightbox src={zoomItem} onClose={() => setZoomItem(null)} />}
                     {sizeGuideCategory && <SizeGuideModal category={sizeGuideCategory} onClose={() => setSizeGuideCategory(null)} />}
+                    {showCart && <InquiryCartModal list={inquiryList} onRemove={removeFromInquiry} onClose={() => setShowCart(false)} />}
                 </div>
             );
         };
