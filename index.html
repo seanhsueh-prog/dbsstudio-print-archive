@@ -1,14 +1,14 @@
-<!-- DbSSTUDIO-Showroom.v1.6.html -->
+<!-- DbSSTUDIO-Showroom.v1.7.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DbSSTUDIO v1.6 - Digital Archive</title>
+    <title>DbSSTUDIO v1.7 - Elite Archive 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [DbSSTUDIO v1.6 - Commercial Flagship / Traditional Chinese] */
+        /* [DbSSTUDIO v1.7 - Elite Archive] */
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             -webkit-font-smoothing: antialiased; 
@@ -22,23 +22,15 @@
         }
         
         .app-container {
-            width: 100%;
-            max-width: 480px; 
-            height: 100vh; 
-            background-color: #F9F9F9;
-            position: relative;
+            width: 100%; max-width: 480px; height: 100vh; 
+            background-color: #F9F9F9; position: relative;
             box-shadow: 0 0 40px rgba(0,0,0,0.03);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            display: flex; flex-direction: column; overflow: hidden;
         }
 
         .content-area {
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 90px;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+            flex: 1; overflow-y: auto; padding-bottom: 90px;
+            -ms-overflow-style: none; scrollbar-width: none;
         }
         .content-area::-webkit-scrollbar { display: none; }
         
@@ -50,37 +42,23 @@
 
         /* Product Card */
         .product-card {
-            background: #fff;
-            margin-bottom: 32px;
-            border: 1px solid #eeeeee;
+            background: #fff; margin-bottom: 32px; border: 1px solid #eeeeee;
         }
         .product-card.hidden-card { display: none !important; }
 
         .size-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 1px solid #e5e5e5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: 500;
-            color: #999;
-            transition: all 0.2s;
-            cursor: pointer;
-            background: #fff;
+            width: 32px; height: 32px; border-radius: 50%;
+            border: 1px solid #e5e5e5; display: flex; align-items: center;
+            justify-content: center; font-size: 11px; font-weight: 500;
+            color: #999; transition: all 0.2s; cursor: pointer; background: #fff;
         }
         .size-btn:hover { border-color: #000; color: #000; }
         .size-btn.active { background: #000; color: #fff; border-color: #000; }
 
         /* Ghost Engine */
         .ghost-canvas-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 4 / 5; 
-            background-color: #fff;
-            overflow: hidden;
+            position: relative; width: 100%; aspect-ratio: 4 / 5; 
+            background-color: #fff; overflow: hidden;
         }
         .ghost-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -92,8 +70,7 @@
         .bottom-nav {
             position: absolute; bottom: 0; left: 0; width: 100%;
             background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(12px);
-            border-top: 1px solid #f0f0f0;
+            backdrop-filter: blur(12px); border-top: 1px solid #f0f0f0;
             display: flex; justify-content: space-around;
             padding: 16px 0 32px 0; z-index: 50;
         }
@@ -105,35 +82,28 @@
         }
         .nav-item.active { color: #000; }
         
-        /* Lightbox */
+        /* Lightbox & Modal */
         .lightbox {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.98);
-            z-index: 100;
+            background: rgba(255,255,255,0.98); z-index: 100;
             display: flex; align-items: center; justify-content: center;
             animation: fade-in 0.2s;
         }
-
-        /* Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(2px);
-            z-index: 90;
-            display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(2px);
+            z-index: 90; display: flex; align-items: center; justify-content: center;
             padding: 20px;
         }
         .modal-content {
-            background: #fff;
-            width: 100%; max-width: 340px;
-            padding: 24px;
-            border-radius: 2px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            position: relative;
+            background: #fff; width: 100%; max-width: 340px; padding: 24px;
+            border-radius: 2px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
         }
 
         .btn-line { background-color: #06C755; color: white; transition: opacity 0.2s; }
         .btn-line:hover { opacity: 0.9; }
+        .btn-try { background-color: #fff; border: 1px solid #000; color: #000; transition: all 0.2s; }
+        .btn-try:hover { background-color: #f5f5f5; }
     </style>
 </head>
 <body>
@@ -148,13 +118,14 @@
 
         // --- CONFIG ---
         const CATEGORIES = [
-            { id: 'short_t', label: '短袖 T-Shirt', prefix: 'st', price: 'NT$ 1,280', name: 'Essential Cotton Tee' },
-            { id: 'long_t', label: '長袖 T-Shirt', prefix: 'lt', price: 'NT$ 1,580', name: 'Layering Long Tee' },
-            { id: 'sweatshirt', label: '衛衣 / 帽T', prefix: 'sw', price: 'NT$ 2,280', name: 'Heavyweight Hoodie' },
-            { id: 'bottom', label: '下身系列', prefix: 'b', price: 'NT$ 2,980', name: 'Classic Trousers' },
-            { id: 'shoes', label: '鞋履系列', prefix: 's', price: 'NT$ 4,580', name: 'Leather Derby' }
+            { id: 'short_t', label: '短袖 T-Shirt', prefix: 'st', name: 'Essential Cotton Tee' },
+            { id: 'long_t', label: '長袖 T-Shirt', prefix: 'lt', name: 'Layering Long Tee' },
+            { id: 'sweatshirt', label: '衛衣 / 帽T', prefix: 'sw', name: 'Heavyweight Hoodie' },
+            { id: 'bottom', label: '下身系列', prefix: 'b', name: 'Classic Trousers' },
+            { id: 'shoes', label: '鞋履系列', prefix: 's', name: 'Leather Derby' }
         ];
         const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
+        const LINE_ID = "@dbsstudio"; // Placeholder Line ID
 
         // --- ICONS ---
         const Icon = ({ name, className }) => {
@@ -165,7 +136,8 @@
                 dice: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/></svg>,
                 chat: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
                 home: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-                hanger: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2a5 5 0 0 1 4.9 6H7.1a5 5 0 0 1 4.9-6Z"/><path d="M21 21H3V11c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v10Z"/></svg>
+                hanger: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2a5 5 0 0 1 4.9 6H7.1a5 5 0 0 1 4.9-6Z"/><path d="M21 21H3V11c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v10Z"/></svg>,
+                eye: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             };
             return icons[name] ? React.cloneElement(icons[name], { className }) : null;
         };
@@ -180,7 +152,6 @@
                 return ''; 
             };
             const src = getSizeChartSrc();
-
             return (
                 <div className="modal-overlay animate-fade-in" onClick={onClose}>
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -198,7 +169,6 @@
                                 </div>
                             )}
                         </div>
-                        <p className="text-[10px] text-gray-400 mt-4 text-center">*單位: cm / 平鋪測量 (Measured flat)</p>
                     </div>
                 </div>
             );
@@ -213,11 +183,20 @@
             </div>
         );
 
-        const ProductCard = ({ item, onZoom, onSizeGuide }) => {
+        const ProductCard = ({ item, onZoom, onSizeGuide, onTryOn }) => {
             const [selectedSize, setSelectedSize] = useState(null);
             const [visible, setVisible] = useState(true);
 
             if (!visible) return null;
+
+            const handleOrder = () => {
+                if (!selectedSize) {
+                    alert("請先選擇尺寸 (Please select a size)");
+                    return;
+                }
+                const msg = encodeURIComponent(`您好，我想諮詢 DbSSTUDIO 2026 商品：${item.name} / ${item.id} / ${selectedSize}`);
+                window.location.href = `https://line.me/R/oaMessage/${LINE_ID}/?${msg}`;
+            };
 
             return (
                 <div className="product-card">
@@ -228,13 +207,13 @@
                         </div>
                     </div>
                     <div className="p-6">
-                        <div className="flex justify-between items-start mb-3">
+                        <div className="flex justify-between items-start mb-1">
                             <div>
                                 <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide leading-tight">{item.name}</h3>
-                                <p className="text-xs text-gray-400 mt-1">{item.catLabel}</p>
+                                <p className="text-xs text-gray-400 mt-1">{item.catLabel} {item.id}</p>
                             </div>
-                            <span className="text-sm font-bold text-black">{item.price}</span>
                         </div>
+
                         <div className="flex items-center justify-between mb-6 mt-4">
                             <div className="flex gap-2">
                                 {SIZES.map(s => (
@@ -245,12 +224,21 @@
                                 <Icon name="ruler" className="w-3 h-3" /> 尺寸對照表
                             </button>
                         </div>
-                        <button 
-                            className={`w-full py-3.5 text-xs font-bold uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2 ${selectedSize ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
-                            onClick={() => selectedSize ? alert(`已將商品加入訂單:\n${item.name}\n尺寸: ${selectedSize}`) : alert("請先選擇尺寸")}
-                        >
-                            <span>立即訂購</span><Icon name="arrowRight" className="w-3 h-3" />
-                        </button>
+
+                        <div className="flex gap-2">
+                            <button 
+                                className="flex-1 py-3.5 btn-try text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2"
+                                onClick={() => onTryOn(item)}
+                            >
+                                <Icon name="hanger" className="w-3 h-3" /> 試穿搭配
+                            </button>
+                            <button 
+                                className={`flex-[1.5] py-3.5 text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${selectedSize ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+                                onClick={handleOrder}
+                            >
+                                <span>立即訂購</span><Icon name="arrowRight" className="w-3 h-3" />
+                            </button>
+                        </div>
                     </div>
                 </div>
             );
@@ -263,6 +251,7 @@
             const [sizeGuideCategory, setSizeGuideCategory] = useState(null);
             const [outfit, setOutfit] = useState({ short_t: null, long_t: null, sweatshirt: null, bottom: null, shoes: null });
 
+            // Catalog Data Generation
             const catalog = useMemo(() => {
                 let items = [];
                 CATEGORIES.forEach(cat => {
@@ -272,32 +261,54 @@
                             : `${cat.prefix}${i}.png`;
                         items.push({
                             uid: `${cat.id}-${i}`, id: `#${cat.prefix.toUpperCase()}${String(i).padStart(3, '0')}`,
-                            catId: cat.id, catLabel: cat.label, name: cat.name, price: cat.price, src: `./${src}`
+                            catId: cat.id, catLabel: cat.label, name: cat.name, src: `./${src}`
                         });
                     }
                 });
                 return items;
             }, []);
 
-            const handleRandom = useCallback(() => {
-                const getRand = (catId) => {
-                    const pool = catalog.filter(i => i.catId === catId);
-                    return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
-                };
-                setOutfit({
-                    short_t: getRand('short_t'),
-                    long_t: Math.random() > 0.7 ? getRand('long_t') : null, 
-                    sweatshirt: Math.random() > 0.5 ? getRand('sweatshirt') : null, 
+            // Helper to get random item
+            const getRand = useCallback((catId) => {
+                const pool = catalog.filter(i => i.catId === catId);
+                return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
+            }, [catalog]);
+
+            // Try It On Logic
+            const handleTryOn = (item) => {
+                // Clear other top layers to focus on the selected one
+                setOutfit(prev => ({
+                    ...prev,
+                    short_t: item.catId === 'short_t' ? item : null,
+                    long_t: item.catId === 'long_t' ? item : null,
+                    sweatshirt: item.catId === 'sweatshirt' ? item : null,
+                    // Auto-fill bottom/shoes if empty
+                    bottom: prev.bottom || getRand('bottom'),
+                    shoes: prev.shoes || getRand('shoes')
+                }));
+                setActiveTab('style');
+            };
+
+            // Smart Pick Logic (Lock Top, Random Bottom/Shoes)
+            const handleSmartPick = () => {
+                const hasTop = outfit.short_t || outfit.long_t || outfit.sweatshirt;
+                setOutfit(prev => ({
+                    ...prev,
+                    // If a top exists, keep it. If not, randomize tops.
+                    short_t: hasTop ? prev.short_t : getRand('short_t'),
+                    long_t: hasTop ? prev.long_t : (Math.random() > 0.7 ? getRand('long_t') : null),
+                    sweatshirt: hasTop ? prev.sweatshirt : null,
+                    // Always randomize bottom & shoes
                     bottom: getRand('bottom'),
                     shoes: getRand('shoes')
-                });
-            }, [catalog]);
+                }));
+            };
 
             return (
                 <div className="app-container">
                     <div className="px-6 pt-10 pb-6 bg-[#F9F9F9] z-10 flex flex-col items-center">
                         <h1 className="text-xl font-extrabold tracking-tighter text-center flex items-center gap-2">DbSSTUDIO</h1>
-                        <span className="text-[10px] text-gray-400 tracking-[0.3em] uppercase mt-1">v1.6 Digital Archive</span>
+                        <span className="text-[10px] text-gray-400 tracking-[0.2em] uppercase mt-1">v1.7 Elite Archive 2026</span>
                     </div>
 
                     <div className="content-area px-5 pt-2">
@@ -305,11 +316,12 @@
                             <div className="animate-fade-in">
                                 <div className="mb-8 text-center">
                                     <h2 className="text-xs font-bold text-gray-900 uppercase tracking-[0.2em] mb-1">Season 2026</h2>
-                                    <p className="text-[10px] text-gray-400 font-light tracking-wide">Ready-to-Wear Collection</p>
+                                    <p className="text-[10px] text-gray-400 font-light tracking-wide">Tops Collection</p>
                                 </div>
                                 <div>
-                                    {catalog.map(item => (
-                                        <ProductCard key={item.uid} item={item} onZoom={setZoomItem} onSizeGuide={setSizeGuideCategory} />
+                                    {/* Filter: Only Tops */}
+                                    {catalog.filter(i => ['short_t', 'long_t', 'sweatshirt'].includes(i.catId)).map(item => (
+                                        <ProductCard key={item.uid} item={item} onZoom={setZoomItem} onSizeGuide={setSizeGuideCategory} onTryOn={handleTryOn} />
                                     ))}
                                 </div>
                                 <div className="text-center py-12 text-[10px] text-gray-300 uppercase tracking-widest border-t border-gray-100 mt-4">- End of Collection -</div>
@@ -324,18 +336,23 @@
                                     {outfit.short_t && <img src={outfit.short_t.src} className="ghost-layer z-30" onError={(e)=>e.target.style.display='none'} />}
                                     {outfit.long_t && <img src={outfit.long_t.src} className="ghost-layer z-[35]" onError={(e)=>e.target.style.display='none'} />}
                                     {outfit.sweatshirt && <img src={outfit.sweatshirt.src} className="ghost-layer z-40" onError={(e)=>e.target.style.display='none'} />}
-                                    {(!outfit.bottom && !outfit.shoes) && (
+                                    {(!outfit.bottom && !outfit.shoes && !outfit.short_t) && (
                                         <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-300">
-                                            <Icon name="dice" className="w-8 h-8 opacity-20 mb-2" />
-                                            <span className="text-xs tracking-widest uppercase">Tap Generate to Start</span>
+                                            <Icon name="eye" className="w-8 h-8 opacity-20 mb-2" />
+                                            <span className="text-xs tracking-widest uppercase">Waiting for Input</span>
                                         </div>
                                     )}
                                 </div>
                                 <div className="px-2">
-                                    <button onClick={handleRandom} className="w-full py-4 bg-black text-white text-xs font-bold uppercase tracking-[0.2em] hover:bg-gray-800 transition-all flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform active:scale-98">
-                                        <Icon name="dice" className="w-4 h-4" /> 智慧搭配 (Generate)
+                                    <button onClick={handleSmartPick} className="w-full py-4 bg-black text-white text-xs font-bold uppercase tracking-[0.2em] hover:bg-gray-800 transition-all flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform active:scale-98">
+                                        <Icon name="dice" className="w-4 h-4" /> 
+                                        { (outfit.short_t || outfit.long_t || outfit.sweatshirt) ? "鎖定上身．切換搭配" : "DBS 智慧選 (Shuffle)" }
                                     </button>
-                                    <p className="text-center text-[10px] text-gray-400 mt-6 leading-relaxed px-4">系統將根據現有庫存進行隨機演算搭配。<br/>AI-Powered Styling Suggestions.</p>
+                                    <p className="text-center text-[10px] text-gray-400 mt-6 leading-relaxed px-4">
+                                        { (outfit.short_t || outfit.long_t || outfit.sweatshirt) 
+                                            ? "已鎖定目前上衣，僅更換下身與鞋款組合。" 
+                                            : "系統將根據現有庫存進行隨機演算搭配。" }
+                                    </p>
                                 </div>
                             </div>
                         )}
@@ -349,22 +366,10 @@
                                 </div>
                                 <div className="mb-10">
                                     <h3 className="text-xs font-bold uppercase tracking-wider mb-3 text-gray-900">品牌精神 (Philosophy)</h3>
-                                    <p className="text-[11px] leading-6 text-gray-500 text-justify">致力於極簡美學與實用主義的完美平衡。我們相信服裝不僅是遮蔽，更是自我風格的無聲語言。每一件單品都經過嚴格篩選與設計，確保在各種場合皆能展現最佳狀態。<br/><br/>Minimalism meets utility.</p>
-                                </div>
-                                <div className="mb-10">
-                                    <h3 className="text-xs font-bold uppercase tracking-wider mb-3 text-gray-900">洗滌建議 (Care)</h3>
-                                    <div className="text-[11px] leading-6 text-gray-500">
-                                        <ul className="list-disc list-inside space-y-1">
-                                            <li>建議反面裝袋冷水機洗</li>
-                                            <li>請勿使用漂白水或強力去漬劑</li>
-                                            <li>深淺色衣物請分開洗滌</li>
-                                            <li>避免高溫烘乾，建議自然陰乾</li>
-                                        </ul>
-                                    </div>
+                                    <p className="text-[11px] leading-6 text-gray-500 text-justify">致力於極簡美學與實用主義的完美平衡。我們相信服裝不僅是遮蔽，更是自我風格的無聲語言。<br/><br/>Minimalism meets utility.</p>
                                 </div>
                                 <div className="mt-auto">
-                                    <button onClick={() => alert("Redirecting to Line...")} className="btn-line w-full py-3.5 rounded flex items-center justify-center gap-2 text-xs font-bold tracking-wide shadow-sm"><Icon name="chat" className="w-4 h-4" /> Line 線上諮詢</button>
-                                    <p className="text-[9px] text-center text-gray-300 mt-4">Service Hours: Mon-Fri 10:00-19:00</p>
+                                    <button onClick={() => window.location.href=`https://line.me/R/oaMessage/${LINE_ID}/?Hi`} className="btn-line w-full py-3.5 rounded flex items-center justify-center gap-2 text-xs font-bold tracking-wide shadow-sm"><Icon name="chat" className="w-4 h-4" /> Line 線上諮詢</button>
                                 </div>
                             </div>
                         )}
