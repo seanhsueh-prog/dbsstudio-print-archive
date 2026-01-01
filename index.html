@@ -1,14 +1,14 @@
-<!-- DbSSTUDIO-Showroom.v1.8.html -->
+<!-- DbSSTUDIO-Showroom.v1.9.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DbSSTUDIO v1.8 - Professional Archive 2026</title>
+    <title>DbSSTUDIO v1.9 - Professional Archive 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [DbSSTUDIO v1.8 - Professional Archive / Commercial] */
+        /* [DbSSTUDIO v1.9 - Refined Commercial] */
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             -webkit-font-smoothing: antialiased; 
@@ -82,19 +82,22 @@
         }
         .nav-item.active { color: #000; }
         
-        /* Lightbox & Modal */
+        /* v1.9 Lightbox - Expanded */
         .lightbox {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.98); z-index: 100;
             display: flex; align-items: center; justify-content: center;
-            animation: fade-in 0.2s;
+            animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        /* v1.8 Lightbox Size Increase */
         .lightbox img {
-            max-height: 85vh; width: auto; max-width: 95vw;
+            width: auto; height: auto;
+            max-width: 90vw; max-height: 85vh;
             object-fit: contain;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+            transform: translateZ(0);
         }
 
+        /* Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(2px);
@@ -199,14 +202,14 @@
 
         const Lightbox = ({ src, onClose }) => (
             <div className="lightbox" onClick={onClose}>
-                <button className="absolute top-6 right-6 p-2 bg-black text-white rounded-full z-10 hover:scale-110 transition-transform" onClick={onClose}>
+                <button className="absolute top-6 right-6 p-3 bg-black text-white rounded-full z-10 hover:scale-110 transition-transform shadow-lg" onClick={onClose}>
                     <Icon name="x" className="w-6 h-6" />
                 </button>
-                <img src={src} />
+                <img src={src} className="animate-fade-in" />
             </div>
         );
 
-        // v1.8 Inquiry Cart Modal
+        // Inquiry Cart
         const InquiryCartModal = ({ list, onRemove, onClose }) => {
             const handleCheckout = () => {
                 if (list.length === 0) return;
@@ -272,7 +275,7 @@
                     return;
                 }
                 onAddToInquiry(item, selectedSize);
-                alert("已加入詢問清單");
+                alert("已加入清單");
             };
 
             return (
@@ -313,7 +316,7 @@
                                 className={`flex-[1.5] py-3.5 text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${selectedSize ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
                                 onClick={handleAdd}
                             >
-                                <span>加入詢問清單</span><Icon name="plus" className="w-3 h-3" />
+                                <span>加入清單</span><Icon name="plus" className="w-3 h-3" />
                             </button>
                         </div>
                     </div>
@@ -328,20 +331,35 @@
             const [sizeGuideCategory, setSizeGuideCategory] = useState(null);
             const [outfit, setOutfit] = useState({ short_t: null, long_t: null, sweatshirt: null, bottom: null, shoes: null });
             
-            // v1.8 Inquiry List State
+            // Cart State
             const [inquiryList, setInquiryList] = useState([]);
             const [showCart, setShowCart] = useState(false);
 
+            // Catalog Generation with v1.9 Logic
             const catalog = useMemo(() => {
                 let items = [];
                 CATEGORIES.forEach(cat => {
                     for(let i=1; i<=15; i++) {
-                        let src = cat.id === 'shoes' 
-                            ? (i<=5 ? `s0${i}.png` : i<=10 ? `w${i-5}.png` : `x0${i-10}.png`) 
-                            : `${cat.prefix}${i}.png`;
+                        let src = '';
+                        let subType = '';
+                        
+                        // v1.9 Shoes Logic: Formal(s), Casual(w), Sneakers(x)
+                        if(cat.id === 'shoes') {
+                           if(i <= 5) { src = `s0${i}.png`; subType = 'Formal'; }
+                           else if(i <= 10) { src = `w${i-5}.png`; subType = 'Casual'; }
+                           else { src = `x0${i-10}.png`; subType = 'Sneakers'; }
+                        } else {
+                            src = `${cat.prefix}${i}.png`;
+                        }
+
                         items.push({
-                            uid: `${cat.id}-${i}`, id: `#${cat.prefix.toUpperCase()}${String(i).padStart(3, '0')}`,
-                            catId: cat.id, catLabel: cat.label, name: cat.name, src: `./${src}`
+                            uid: `${cat.id}-${i}`, 
+                            id: `#${cat.prefix.toUpperCase()}${String(i).padStart(3, '0')}`,
+                            catId: cat.id, 
+                            catLabel: cat.label, 
+                            name: cat.name + (subType ? ` (${subType})` : ''), 
+                            src: `./${src}`,
+                            subType: subType // internal use
                         });
                     }
                 });
@@ -377,7 +395,6 @@
                 }));
             };
 
-            // Inquiry Handlers
             const addToInquiry = (item, size) => {
                 setInquiryList(prev => [...prev, { ...item, size }]);
             };
@@ -389,7 +406,7 @@
                 <div className="app-container">
                     <div className="px-6 pt-10 pb-6 bg-[#F9F9F9] z-10 flex flex-col items-center">
                         <h1 className="text-xl font-extrabold tracking-tighter text-center flex items-center gap-2">DbSSTUDIO</h1>
-                        <span className="text-[10px] text-gray-400 tracking-[0.2em] uppercase mt-1">v1.8 Professional Archive 2026</span>
+                        <span className="text-[10px] text-gray-400 tracking-[0.2em] uppercase mt-1">v1.9 Professional Archive 2026</span>
                     </div>
 
                     <div className="content-area px-5 pt-2">
@@ -402,12 +419,9 @@
                                 <div>
                                     {catalog.filter(i => ['short_t', 'long_t', 'sweatshirt'].includes(i.catId)).map(item => (
                                         <ProductCard 
-                                            key={item.uid} 
-                                            item={item} 
-                                            onZoom={setZoomItem} 
-                                            onSizeGuide={setSizeGuideCategory} 
-                                            onTryOn={handleTryOn} 
-                                            onAddToInquiry={addToInquiry}
+                                            key={item.uid} item={item} 
+                                            onZoom={setZoomItem} onSizeGuide={setSizeGuideCategory} 
+                                            onTryOn={handleTryOn} onAddToInquiry={addToInquiry}
                                         />
                                     ))}
                                 </div>
@@ -458,7 +472,6 @@
                         )}
                     </div>
 
-                    {/* Inquiry Cart Floating Button */}
                     {inquiryList.length > 0 && (
                         <div className="floating-cart animate-fade-in" onClick={() => setShowCart(true)}>
                             <Icon name="cart" className="w-5 h-5" />
