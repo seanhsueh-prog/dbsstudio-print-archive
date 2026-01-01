@@ -1,21 +1,22 @@
-<!-- DbSSTUDIO-Showroom.v2.0.html -->
+<!-- DbSSTUDIO-Showroom.v2.1.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>DbSSTUDIO v2.0 - Ultimate Archive 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DbSSTUDIO v2.1 - Professional App Archive 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [DbSSTUDIO v2.0 - Ultimate Archive] */
+        /* [DbSSTUDIO v2.1 - App-Like Experience] */
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             -webkit-font-smoothing: antialiased; 
             background-color: #F9F9F9; 
             color: #111; 
             margin: 0;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden; /* Lock body scroll */
             display: flex;
             justify-content: center; 
             align-items: flex-start;
@@ -31,6 +32,7 @@
         .content-area {
             flex: 1; overflow-y: auto; padding-bottom: 90px;
             -ms-overflow-style: none; scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
         }
         .content-area::-webkit-scrollbar { display: none; }
         
@@ -55,7 +57,7 @@
         .size-btn:hover { border-color: #000; color: #000; }
         .size-btn.active { background: #000; color: #fff; border-color: #000; }
 
-        /* Ghost Engine */
+        /* Ghost Engine - Maximized */
         .ghost-canvas-container {
             position: relative; width: 100%; aspect-ratio: 3.5 / 5; 
             background-color: #fff; overflow: hidden; margin-bottom: 12px;
@@ -82,9 +84,9 @@
         }
         .nav-item.active { color: #000; }
         
-        /* v2.0 Supreme Lightbox */
+        /* v2.1 Critical Fix - Shocking Lightbox */
         .lightbox-container {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.99); 
             z-index: 99999; /* Supreme Layer */
             display: flex; align-items: center; justify-content: center;
@@ -98,7 +100,7 @@
             object-fit: contain !important;
             box-shadow: 0 40px 80px rgba(0,0,0,0.15);
             transform: translateZ(0);
-            cursor: default;
+            cursor: default; /* Prevent closing on click */
         }
 
         /* Modal */
@@ -206,9 +208,9 @@
             );
         };
 
-        // 2. Lightbox (v2.0 Fixed)
+        // 2. Lightbox (v2.1 Fixed - The Shocking Zoom)
         const Lightbox = ({ src, onClose }) => {
-            // Using Portal or High Z-Index fixed container
+            // High Z-Index fixed container
             return (
                 <div className="lightbox-container" onClick={onClose}>
                     <button className="absolute top-6 right-6 p-4 bg-black text-white rounded-full z-[100000] hover:scale-110 transition-transform shadow-lg" onClick={onClose}>
@@ -219,7 +221,7 @@
                         className="lightbox-img" 
                         onClick={(e) => {
                             e.preventDefault();
-                            e.stopPropagation();
+                            e.stopPropagation(); // Critical Fix: Prevent close on image click
                         }} 
                         alt="Detail Zoom"
                     />
@@ -368,7 +370,7 @@
                         let src = '';
                         let subType = '';
                         
-                        // v2.0 Shoes Logic
+                        // v2.1 Shoes Logic: s0x, w0x, x0x
                         if(cat.id === 'shoes') {
                            if(i <= 5) { src = `s0${i}.png`; subType = 'Formal'; }
                            else if(i <= 10) { src = `w${i-5}.png`; subType = 'Casual'; }
@@ -431,7 +433,7 @@
                 <div className="app-container">
                     <div className="px-6 pt-10 pb-6 bg-[#F9F9F9] z-10 flex flex-col items-center">
                         <h1 className="text-xl font-extrabold tracking-tighter text-center flex items-center gap-2">DbSSTUDIO</h1>
-                        <span className="text-[10px] text-gray-400 tracking-[0.2em] uppercase mt-1">v2.0 Ultimate Archive 2026</span>
+                        <span className="text-[10px] text-gray-400 tracking-[0.2em] uppercase mt-1">v2.1 Professional App Archive 2026</span>
                     </div>
 
                     <div className="content-area px-5 pt-2">
