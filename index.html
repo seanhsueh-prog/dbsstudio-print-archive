@@ -1,14 +1,14 @@
-<!-- DbSSTUDIO-Showroom.v1.9.html -->
+<!-- DbSSTUDIO-Showroom.v2.0.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DbSSTUDIO v1.9 - Professional Archive 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>DbSSTUDIO v2.0 - Ultimate Archive 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [DbSSTUDIO v1.9 - Professional Archive] */
+        /* [DbSSTUDIO v2.0 - Ultimate Archive] */
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             -webkit-font-smoothing: antialiased; 
@@ -55,7 +55,7 @@
         .size-btn:hover { border-color: #000; color: #000; }
         .size-btn.active { background: #000; color: #fff; border-color: #000; }
 
-        /* Ghost Engine - Maximized */
+        /* Ghost Engine */
         .ghost-canvas-container {
             position: relative; width: 100%; aspect-ratio: 3.5 / 5; 
             background-color: #fff; overflow: hidden; margin-bottom: 12px;
@@ -82,35 +82,35 @@
         }
         .nav-item.active { color: #000; }
         
-        /* v1.9 Lightbox - Critical Fix */
-        .lightbox {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.98); 
-            z-index: 9999; /* Highest priority */
+        /* v2.0 Supreme Lightbox */
+        .lightbox-container {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(255,255,255,0.99); 
+            z-index: 99999; /* Supreme Layer */
             display: flex; align-items: center; justify-content: center;
             animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             cursor: zoom-out;
         }
-        .lightbox img {
-            width: auto; height: auto;
-            max-width: 90vw; /* 90% Viewport Width */
-            max-height: 85vh; /* 85% Viewport Height */
-            object-fit: contain;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.12); /* Elevated Shadow */
+        .lightbox-img {
+            width: 95vw !important; 
+            height: auto !important;
+            max-height: 90vh !important;
+            object-fit: contain !important;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.15);
             transform: translateZ(0);
-            cursor: default; /* Prevent zoom cursor on image */
+            cursor: default;
         }
 
         /* Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(2px);
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
             z-index: 90; display: flex; align-items: center; justify-content: center;
             padding: 20px;
         }
         .modal-content {
             background: #fff; width: 100%; max-width: 360px; padding: 24px;
-            border-radius: 2px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            border-radius: 2px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
             max-height: 80vh; overflow-y: auto;
         }
 
@@ -122,7 +122,7 @@
             position: absolute; bottom: 100px; right: 20px;
             width: 50px; height: 50px; background: #000; color: #fff;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 40;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25); z-index: 40;
             cursor: pointer; transition: transform 0.2s;
         }
         .floating-cart:active { transform: scale(0.9); }
@@ -206,20 +206,26 @@
             );
         };
 
-        // 2. Lightbox (v1.9 Critical Fix: Stop Propagation)
-        const Lightbox = ({ src, onClose }) => (
-            <div className="lightbox" onClick={onClose}>
-                <button className="absolute top-6 right-6 p-3 bg-black text-white rounded-full z-10 hover:scale-110 transition-transform shadow-lg" onClick={onClose}>
-                    <Icon name="x" className="w-6 h-6" />
-                </button>
-                <img 
-                    src={src} 
-                    className="animate-fade-in" 
-                    onClick={(e) => e.stopPropagation()} 
-                    alt="Detail Zoom"
-                />
-            </div>
-        );
+        // 2. Lightbox (v2.0 Fixed)
+        const Lightbox = ({ src, onClose }) => {
+            // Using Portal or High Z-Index fixed container
+            return (
+                <div className="lightbox-container" onClick={onClose}>
+                    <button className="absolute top-6 right-6 p-4 bg-black text-white rounded-full z-[100000] hover:scale-110 transition-transform shadow-lg" onClick={onClose}>
+                        <Icon name="x" className="w-6 h-6" />
+                    </button>
+                    <img 
+                        src={src} 
+                        className="lightbox-img" 
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }} 
+                        alt="Detail Zoom"
+                    />
+                </div>
+            );
+        };
 
         // 3. Inquiry Cart
         const InquiryCartModal = ({ list, onRemove, onClose }) => {
@@ -291,9 +297,15 @@
                 alert("已加入清單");
             };
 
+            const handleZoomClick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onZoom(item.src);
+            };
+
             return (
                 <div className="product-card">
-                    <div className="relative aspect-[4/5] bg-white cursor-zoom-in group" onClick={() => onZoom(item.src)}>
+                    <div className="relative aspect-[4/5] bg-white cursor-zoom-in group" onClick={handleZoomClick}>
                         <img src={item.src} alt={item.name} className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105" onError={() => setVisible(false)} />
                         <div className="absolute bottom-0 left-0 w-full p-3 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex justify-end">
                             <span className="bg-white/90 backdrop-blur text-[9px] px-2 py-1 rounded shadow-sm font-bold uppercase tracking-wider">Zoom</span>
@@ -348,7 +360,7 @@
             const [inquiryList, setInquiryList] = useState([]);
             const [showCart, setShowCart] = useState(false);
 
-            // Catalog Generation with v1.9 Logic
+            // Catalog Generation
             const catalog = useMemo(() => {
                 let items = [];
                 CATEGORIES.forEach(cat => {
@@ -356,7 +368,7 @@
                         let src = '';
                         let subType = '';
                         
-                        // v1.9 Shoes Logic: Formal(s0x), Casual(w0x), Sneakers(x0x)
+                        // v2.0 Shoes Logic
                         if(cat.id === 'shoes') {
                            if(i <= 5) { src = `s0${i}.png`; subType = 'Formal'; }
                            else if(i <= 10) { src = `w${i-5}.png`; subType = 'Casual'; }
@@ -419,7 +431,7 @@
                 <div className="app-container">
                     <div className="px-6 pt-10 pb-6 bg-[#F9F9F9] z-10 flex flex-col items-center">
                         <h1 className="text-xl font-extrabold tracking-tighter text-center flex items-center gap-2">DbSSTUDIO</h1>
-                        <span className="text-[10px] text-gray-400 tracking-[0.2em] uppercase mt-1">v1.9 Professional Archive 2026</span>
+                        <span className="text-[10px] text-gray-400 tracking-[0.2em] uppercase mt-1">v2.0 Ultimate Archive 2026</span>
                     </div>
 
                     <div className="content-area px-5 pt-2">
@@ -444,7 +456,6 @@
 
                         {activeTab === 'style' && (
                             <div className="animate-fade-in flex flex-col h-full">
-                                {/* Maximized Ghost Engine */}
                                 <div className="ghost-canvas-container bg-white shadow-sm border border-gray-100 mb-4">
                                     {outfit.shoes && <img src={outfit.shoes.src} className="ghost-layer z-10" onError={(e)=>e.target.style.display='none'} />}
                                     {outfit.bottom && <img src={outfit.bottom.src} className="ghost-layer z-20" onError={(e)=>e.target.style.display='none'} />}
