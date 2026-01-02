@@ -1,14 +1,14 @@
-<!-- DbSSTUDIO-Showroom.v3.3.html -->
+<!-- DbSSTUDIO-Showroom.v3.4.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DbSSTUDIO v3.3 - Ultimate Archive 2026</title>
+    <title>DbSSTUDIO v3.4 - Ultimate Archive 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [DbSSTUDIO v3.3 - Integrity & Flow] */
+        /* [DbSSTUDIO v3.4 - Stability & Commerce Logic] */
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             -webkit-font-smoothing: antialiased; 
@@ -42,11 +42,19 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in { animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        @keyframes click-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        .animate-click { animation: click-pulse 0.2s ease-in-out; }
 
         /* Header */
         .brand-header {
             padding: 24px 0 12px 0;
             background: #fff; text-align: center;
+            border-bottom: 1px solid #f9f9f9;
         }
 
         /* 3-Column Grid */
@@ -55,7 +63,7 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 1px;
             background-color: #f0f0f0;
-            padding-bottom: 20px;
+            padding-bottom: 40px; /* Ensure bottom visibility */
         }
         .grid-item {
             background-color: #fff;
@@ -101,7 +109,7 @@
         .ghost-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             object-fit: contain; object-position: bottom center;
-            pointer-events: none; transition: opacity 0.3s ease-in-out;
+            pointer-events: none; transition: opacity 0.2s ease-out;
         }
 
         .style-controls {
@@ -145,10 +153,11 @@
             display: flex; align-items: center; justify-content: center;
             padding: 4px; cursor: pointer; transition: border-color 0.2s;
         }
-        .thumb-item[data-cat="shoes"] img { transform: scale(1.1); }
+        .thumb-item[data-cat="shoes"] img { transform: scale(1.15); }
         .thumb-item.active { border-color: #000; background: #f9f9f9; }
         .thumb-item img { width: 100%; height: 100%; object-fit: contain; }
-        
+        .thumb-item.hidden { display: none; }
+
         /* Detail Modal */
         .detail-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -200,12 +209,13 @@
             position: absolute; bottom: 100px; right: 20px;
             width: 48px; height: 48px; background: #000; color: #fff;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 90; cursor: pointer;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 90;
+            cursor: pointer;
         }
         .cart-badge {
-            position: absolute; top: 0; right: 0; width: 16px; height: 16px; 
-            background: #FF3B30; border-radius: 50%; font-size: 9px; 
-            display: flex; align-items: center; justify-content: center;
+            position: absolute; top: 0; right: 0;
+            width: 16px; height: 16px; background: #FF3B30;
+            border-radius: 50%; font-size: 9px; display: flex; align-items: center; justify-content: center;
         }
     </style>
 </head>
@@ -217,16 +227,25 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo, useCallback } = React;
+        const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
-        // --- 1. DATA CONFIG (v3.3) ---
+        // --- 1. DATA CONFIG (v3.4 Precise Counts) ---
+        const COUNTS = {
+            short_t: 15,
+            long_t: 15,
+            sweatshirt: 10,
+            bottom: 16,
+            shoes: 10
+        };
+
         const CATEGORIES = [
-            { id: 'short_t', label: '短 T-Shirt', prefix: 'st', name: 'Cotton Tee' },
-            { id: 'long_t', label: '長 T-Shirt', prefix: 'lt', name: 'Layering Long' },
-            { id: 'sweatshirt', label: '衛衣 Hoodie', prefix: 'sw', name: 'Heavyweight' },
-            { id: 'bottom', label: '下身 Bottoms', prefix: 'b', name: 'Trousers' },
-            { id: 'shoes', label: '鞋履 Shoes', prefix: 's', name: 'Footwear' }
+            { id: 'short_t', label: '短 T-Shirt', prefix: 'st', name: 'Cotton Tee', count: COUNTS.short_t },
+            { id: 'long_t', label: '長 T-Shirt', prefix: 'lt', name: 'Layering Long', count: COUNTS.long_t },
+            { id: 'sweatshirt', label: '衛衣 Hoodie', prefix: 'sw', name: 'Heavyweight', count: COUNTS.sweatshirt },
+            { id: 'bottom', label: '下身 Bottoms', prefix: 'b', name: 'Trousers', count: COUNTS.bottom },
+            { id: 'shoes', label: '鞋履 Shoes', prefix: 's', name: 'Footwear', count: COUNTS.shoes }
         ];
+        
         const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
         const LINE_ID = "@dbsstudio"; 
 
@@ -312,19 +331,25 @@
             
             // Style Page States
             const [styleCategory, setStyleCategory] = useState('tops'); 
-            const [styleSubFilter, setStyleSubFilter] = useState('all'); // v3.3 New Sub-filter
+            const [styleSubFilter, setStyleSubFilter] = useState('all'); 
+            
+            // Dice Animation State
+            const [isShuffling, setIsShuffling] = useState(false);
 
             const [detailItem, setDetailItem] = useState(null);
             const [inquiryList, setInquiryList] = useState([]);
             const [showCart, setShowCart] = useState(false);
 
             const [outfit, setOutfit] = useState({ short_t: null, long_t: null, sweatshirt: null, bottom: null, shoes: null });
+            
+            // Ref for carousel
+            const carouselRef = useRef(null);
 
-            // Catalog Generation (v3.3 Expanded to 20)
+            // Catalog Generation (v3.4 Inventory Limit)
             const catalog = useMemo(() => {
                 let items = [];
                 CATEGORIES.forEach(cat => {
-                    for(let i=1; i<=20; i++) { // Increased limit
+                    for(let i=1; i<=cat.count; i++) { // Using defined counts
                         let baseName = '';
                         const idSuffix = String(i).padStart(3, '0');
 
@@ -363,7 +388,7 @@
                 return catalog.filter(i => i.catId === catalogTab);
             }, [catalog, catalogTab]);
 
-            // Style Thumbnail Logic (v3.3 Sub-filters)
+            // Style Thumbnail Logic
             const styleThumbnails = useMemo(() => {
                 let pool = [];
                 if (styleCategory === 'tops') {
@@ -380,6 +405,11 @@
                 return pool;
             }, [catalog, styleCategory, styleSubFilter]);
 
+            // Reset carousel on filter change
+            useEffect(() => {
+                if (carouselRef.current) carouselRef.current.scrollLeft = 0;
+            }, [styleCategory, styleSubFilter]);
+
             const addToInquiry = (item, size) => {
                 setInquiryList(prev => [...prev, { ...item, size }]);
                 setDetailItem(null); 
@@ -390,17 +420,26 @@
             };
 
             const handleShuffle = () => {
+                setIsShuffling(true);
+                setTimeout(() => setIsShuffling(false), 200);
+
                 const getRandom = (catId) => {
                     const pool = catalog.filter(i => i.catId === catId);
                     return pool[Math.floor(Math.random() * pool.length)];
                 };
+                
+                // Three-in-One Logic: Force update Top + Bottom + Shoes
                 const topType = Math.random();
                 let newTop = {};
                 if (topType < 0.33) newTop = { short_t: getRandom('short_t'), long_t: null, sweatshirt: null };
                 else if (topType < 0.66) newTop = { short_t: null, long_t: getRandom('long_t'), sweatshirt: null };
                 else newTop = { short_t: null, long_t: null, sweatshirt: getRandom('sweatshirt') };
 
-                setOutfit({ ...newTop, bottom: getRandom('bottom'), shoes: getRandom('shoes') });
+                setOutfit({
+                    ...newTop,
+                    bottom: getRandom('bottom'),
+                    shoes: getRandom('shoes')
+                });
             };
 
             const handleManualStyle = (item) => {
@@ -422,7 +461,6 @@
                 }
             };
 
-            // v3.3 Fix: Hide broken thumbnails completely
             const handleThumbError = (e) => {
                 e.target.parentElement.style.display = 'none';
             };
@@ -436,7 +474,7 @@
                             <div className="brand-header">
                                 <h1 className="text-xl font-bold tracking-tighter text-center">
                                     DbSSTUDIO
-                                    <span className="ml-2 font-light text-xs text-gray-400 tracking-widest block mt-1">v3.3 ARCHIVE</span>
+                                    <span className="ml-2 font-light text-xs text-gray-400 tracking-widest block mt-1">v3.4 ARCHIVE</span>
                                 </h1>
                             </div>
 
@@ -453,7 +491,11 @@
                                 <div className="catalog-grid">
                                     {filteredCatalog.map(item => (
                                         <div key={item.uid} className="grid-item" onClick={() => setDetailItem(item)}>
-                                            <img src={item.srcDisplay} alt={item.id} onError={(e) => handleGridImgError(e, item)} />
+                                            <img 
+                                                src={item.srcDisplay} 
+                                                alt={item.id} 
+                                                onError={(e) => handleGridImgError(e, item)} 
+                                            />
                                             <div className="absolute bottom-1 right-1 text-[8px] text-gray-400">{item.id}</div>
                                         </div>
                                     ))}
@@ -489,7 +531,7 @@
                                         <button onClick={()=>setStyleCategory('bottoms')} className={`cat-btn ${styleCategory==='bottoms'?'active':''}`}>BOTTOMS</button>
                                         <button onClick={()=>setStyleCategory('shoes')} className={`cat-btn ${styleCategory==='shoes'?'active':''}`}>SHOES</button>
                                     </div>
-                                    <button onClick={handleShuffle} className="p-2 rounded-full hover:bg-gray-100 z-50">
+                                    <button onClick={handleShuffle} className={`p-3 rounded-full hover:bg-gray-100 z-50 ${isShuffling ? 'animate-click' : ''}`}>
                                         <Icon name="dice" className="w-5 h-5 text-black" />
                                     </button>
                                 </div>
@@ -504,7 +546,7 @@
                                 )}
                             </div>
 
-                            <div className="style-thumbnails">
+                            <div className="style-thumbnails" ref={carouselRef}>
                                 {styleThumbnails.map(item => (
                                     <div key={item.uid} className="thumb-item" data-cat={item.catId} onClick={() => handleManualStyle(item)}>
                                         <img src={item.srcDisplay} alt={item.id} onError={handleThumbError} />
