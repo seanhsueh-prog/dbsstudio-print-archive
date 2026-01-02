@@ -1,21 +1,21 @@
-<!-- DbSSTUDIO-Showroom.v3.0.html -->
+<!-- DbSSTUDIO-Showroom.v3.1.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DbSSTUDIO v3.0 - Professional Archive 2026</title>
+    <title>DbSSTUDIO v3.1 - Ultimate Archive 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [DbSSTUDIO v3.0 - Ultimate Professional] */
+        /* [DbSSTUDIO v3.1 - Ultimate Professional] */
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             -webkit-font-smoothing: antialiased; 
             background-color: #F9F9F9; 
             color: #111; 
             margin: 0;
-            height: 100dvh; /* Mobile Address Bar Fix */
+            height: 100dvh;
             overflow: hidden; 
             display: flex;
             justify-content: center; 
@@ -43,12 +43,18 @@
         }
         .animate-fade-in { animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
+        /* Header */
+        .brand-header {
+            padding: 24px 0 12px 0;
+            background: #fff; text-align: center;
+        }
+
         /* 3-Column Grid Layout */
         .catalog-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1px;
-            background-color: #f0f0f0; /* Grid lines */
+            background-color: #f0f0f0;
             padding-bottom: 20px;
         }
         .grid-item {
@@ -59,18 +65,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
         .grid-item img {
             width: 100%; height: 100%; object-fit: contain; padding: 4px;
-            transition: transform 0.2s;
+            transition: transform 0.3s ease;
         }
         .grid-item:active img { transform: scale(0.95); }
 
         /* Sticky Header Tabs */
         .sticky-tabs {
             position: sticky; top: 0; z-index: 40;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(8px);
+            background: rgba(255,255,255,0.98);
             border-bottom: 1px solid #eee;
             display: flex; overflow-x: auto;
             -ms-overflow-style: none; scrollbar-width: none;
@@ -88,11 +94,9 @@
         /* Style Page Layout */
         .style-layout { display: flex; flex-direction: column; height: 100%; }
         
-        /* 1. Preview Area (Ghost) */
         .style-preview {
             flex: 1; position: relative;
-            background: #fff; /* Pure background */
-            overflow: hidden;
+            background: #fff; overflow: hidden;
         }
         .ghost-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -100,17 +104,14 @@
             pointer-events: none; transition: opacity 0.3s ease-in-out;
         }
 
-        /* 2. Control Bar */
         .style-controls {
-            padding: 8px 16px;
+            padding: 8px 12px;
             border-top: 1px solid #f0f0f0;
             border-bottom: 1px solid #f0f0f0;
             display: flex; justify-content: space-between; align-items: center;
             background: #fff;
         }
-        .cat-switch {
-            display: flex; gap: 4px;
-        }
+        .cat-switch { display: flex; gap: 4px; }
         .cat-btn {
             padding: 6px 12px; border-radius: 99px;
             font-size: 10px; font-weight: 600;
@@ -119,13 +120,11 @@
         }
         .cat-btn.active { background: #000; color: #fff; }
 
-        /* 3. Horizontal Thumbnails */
+        /* Thumbnails */
         .style-thumbnails {
-            height: 100px;
-            background: #fff;
+            height: 100px; background: #fff;
             display: flex; gap: 8px; padding: 8px 12px;
-            overflow-x: auto;
-            -ms-overflow-style: none; scrollbar-width: none;
+            overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
         }
         .style-thumbnails::-webkit-scrollbar { display: none; }
         .thumb-item {
@@ -134,10 +133,13 @@
             display: flex; align-items: center; justify-content: center;
             padding: 4px; cursor: pointer; transition: border-color 0.2s;
         }
+        /* Make shoes slightly larger in thumb */
+        .thumb-item[data-cat="shoes"] img { transform: scale(1.1); }
+        
         .thumb-item.active { border-color: #000; background: #f9f9f9; }
         .thumb-item img { width: 100%; height: 100%; object-fit: contain; }
 
-        /* Detail Modal (Shocking Lightbox with UI) */
+        /* Detail Modal (Lightbox UI) */
         .detail-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.99); z-index: 99999;
@@ -147,6 +149,7 @@
         .detail-image-area {
             flex: 1; overflow: auto; position: relative;
             display: flex; justify-content: center;
+            -webkit-overflow-scrolling: touch;
         }
         .detail-img {
             width: 150vw; max-width: none; height: auto;
@@ -154,15 +157,14 @@
             object-fit: contain;
         }
         .detail-controls {
-            padding: 20px; background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid #eee;
+            padding: 24px; background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px); border-top: 1px solid #eee;
         }
 
         .size-btn {
-            width: 36px; height: 36px; border-radius: 50%;
+            width: 40px; height: 40px; border-radius: 50%;
             border: 1px solid #e5e5e5; display: flex; align-items: center;
-            justify-content: center; font-size: 11px; font-weight: 500;
+            justify-content: center; font-size: 12px; font-weight: 500;
             color: #999; transition: all 0.2s; background: #fff;
         }
         .size-btn.active { background: #000; color: #fff; border-color: #000; }
@@ -210,10 +212,6 @@
         const { useState, useEffect, useMemo, useCallback } = React;
 
         // --- 1. DATA & LOGIC ---
-        // Naming Convention: 
-        // Display: {prefix}{i}_d.png (Fallbacks to {prefix}{i}.png)
-        // Ghost:   {prefix}{i}_g.png (Fallbacks to {prefix}{i}.png)
-        
         const CATEGORIES = [
             { id: 'short_t', label: '短 T-Shirt', prefix: 'st', name: 'Cotton Tee' },
             { id: 'long_t', label: '長 T-Shirt', prefix: 'lt', name: 'Layering Long' },
@@ -273,10 +271,16 @@
             );
         };
 
-        // 2. Detail Modal (Shocking Lightbox with UI)
+        // 2. Detail Modal (Shocking Lightbox with Fallback)
         const DetailModal = ({ item, onClose, onAdd }) => {
             const [size, setSize] = useState(null);
             
+            const handleImgError = (e) => {
+                if (e.target.src !== item.srcOriginal) {
+                    e.target.src = item.srcOriginal;
+                }
+            };
+
             return (
                 <div className="detail-modal">
                     <div className="absolute top-0 w-full p-4 flex justify-end z-20">
@@ -284,18 +288,18 @@
                     </div>
                     
                     <div className="detail-image-area">
-                        <img src={item.srcDisplay} className="detail-img" alt={item.id} />
+                        <img 
+                            src={item.srcDisplay} 
+                            className="detail-img" 
+                            alt={item.id}
+                            onError={handleImgError} 
+                        />
                     </div>
 
                     <div className="detail-controls">
-                        <div className="flex justify-between items-center mb-4">
-                            <div>
-                                <h2 className="text-lg font-bold">{item.id}</h2>
-                                <p className="text-xs text-gray-500">{item.name}</p>
-                            </div>
-                            <div className="text-right">
-                                <span className="text-xs font-bold block">NT$ 1,280</span>
-                            </div>
+                        <div className="mb-4">
+                            <h2 className="text-lg font-bold">{item.id}</h2>
+                            <p className="text-xs text-gray-500">{item.name}</p>
                         </div>
 
                         <div className="flex gap-2 mb-6 justify-center">
@@ -320,43 +324,32 @@
         const App = () => {
             const [activeTab, setActiveTab] = useState('new');
             const [catalogTab, setCatalogTab] = useState('all');
-            const [styleCategory, setStyleCategory] = useState('tops'); // tops, bottoms, shoes
+            const [styleCategory, setStyleCategory] = useState('tops'); 
             
             const [detailItem, setDetailItem] = useState(null);
             const [inquiryList, setInquiryList] = useState([]);
             const [showCart, setShowCart] = useState(false);
 
-            // Outfit State
             const [outfit, setOutfit] = useState({ short_t: null, long_t: null, sweatshirt: null, bottom: null, shoes: null });
 
-            // Data Generation (v3.0 Dual Image Logic)
+            // Data Generation (v3.1 with Fallback Sources)
             const catalog = useMemo(() => {
                 let items = [];
                 CATEGORIES.forEach(cat => {
                     for(let i=1; i<=15; i++) {
-                        // Display Image (Grid/Detail)
-                        let d_src = '';
-                        // Ghost Image (Style Overlay)
-                        let g_src = '';
-                        
-                        let baseName = '';
+                        let d_src = '', g_src = '', baseName = '', o_src = '';
 
-                        // Logic for Shoes/Bottoms vs Tops
                         if (cat.id === 'shoes') {
                             if (i <= 5) baseName = `s0${i}`;
                             else if (i <= 10) baseName = `w${i-5}`;
                             else baseName = `x0${i-10}`;
-                            d_src = `${baseName}.png`; // Shoes/Bottoms reuse same image mostly
-                            g_src = `${baseName}.png`;
+                            d_src = `${baseName}.png`; g_src = `${baseName}.png`; o_src = `${baseName}.png`;
                         } else if (cat.id === 'bottom') {
                             baseName = `b${i}`;
-                            d_src = `${baseName}.png`;
-                            g_src = `${baseName}.png`;
+                            d_src = `${baseName}.png`; g_src = `${baseName}.png`; o_src = `${baseName}.png`;
                         } else {
-                            // Tops have _d and _g
                             baseName = `${cat.prefix}${i}`;
-                            d_src = `${baseName}_d.png`;
-                            g_src = `${baseName}_g.png`;
+                            d_src = `${baseName}_d.png`; g_src = `${baseName}_g.png`; o_src = `${baseName}.png`;
                         }
 
                         items.push({
@@ -366,7 +359,7 @@
                             name: cat.name,
                             srcDisplay: `./${d_src}`,
                             srcGhost: `./${g_src}`,
-                            // Helper to know which slot this goes to in outfit
+                            srcOriginal: `./${o_src}`, // Fallback
                             slot: cat.id
                         });
                     }
@@ -388,10 +381,9 @@
                 return [];
             }, [catalog, styleCategory]);
 
-            // Actions
             const addToInquiry = (item, size) => {
                 setInquiryList(prev => [...prev, { ...item, size }]);
-                setDetailItem(null); // Close modal
+                setDetailItem(null); 
             };
 
             const removeFromInquiry = (idx) => {
@@ -399,52 +391,61 @@
             };
 
             const handleShuffle = () => {
-                // Randomize entire outfit
                 const getRandom = (catId) => {
                     const pool = catalog.filter(i => i.catId === catId);
                     return pool[Math.floor(Math.random() * pool.length)];
                 };
-                
-                // Randomize top type (33% chance each)
                 const topType = Math.random();
                 let newTop = {};
                 if (topType < 0.33) newTop = { short_t: getRandom('short_t'), long_t: null, sweatshirt: null };
                 else if (topType < 0.66) newTop = { short_t: null, long_t: getRandom('long_t'), sweatshirt: null };
                 else newTop = { short_t: null, long_t: null, sweatshirt: getRandom('sweatshirt') };
 
-                setOutfit({
-                    ...newTop,
-                    bottom: getRandom('bottom'),
-                    shoes: getRandom('shoes')
-                });
+                setOutfit({ ...newTop, bottom: getRandom('bottom'), shoes: getRandom('shoes') });
             };
 
             const handleManualStyle = (item) => {
                 setOutfit(prev => {
-                    // Logic to clear conflicting tops
                     const newOutfit = { ...prev };
                     if (['short_t', 'long_t', 'sweatshirt'].includes(item.slot)) {
-                        newOutfit.short_t = null;
-                        newOutfit.long_t = null;
-                        newOutfit.sweatshirt = null;
+                        newOutfit.short_t = null; newOutfit.long_t = null; newOutfit.sweatshirt = null;
                     }
                     newOutfit[item.slot] = item;
                     return newOutfit;
                 });
             };
 
+            // Image Error Handler for Grid
+            const handleGridImgError = (e, item) => {
+                if (e.target.src !== new URL(item.srcOriginal, window.location.href).href) {
+                    e.target.src = item.srcOriginal;
+                } else {
+                    e.target.style.display = 'none'; // Both failed
+                }
+            };
+
             return (
                 <div className="app-container">
                     
-                    {/* PAGE 1: NEW ARRIVALS (CATALOG) */}
+                    {/* PAGE 1: NEW ARRIVALS */}
                     {activeTab === 'new' && (
                         <>
+                            {/* Brand Header v3.1 */}
+                            <div className="brand-header">
+                                <h1 className="text-xl font-bold tracking-tighter text-center">
+                                    DbSSTUDIO
+                                    <span className="ml-2 font-light text-xs text-gray-400 tracking-widest block mt-1">v3.1 ARCHIVE</span>
+                                </h1>
+                            </div>
+
                             {/* Sticky Tabs */}
                             <div className="sticky-tabs">
-                                <button onClick={()=>setCatalogTab('all')} className={`tab-btn ${catalogTab==='all'?'active':''}`}>全部 ALL</button>
-                                <button onClick={()=>setCatalogTab('short_t')} className={`tab-btn ${catalogTab==='short_t'?'active':''}`}>短T T-Shirt</button>
-                                <button onClick={()=>setCatalogTab('long_t')} className={`tab-btn ${catalogTab==='long_t'?'active':''}`}>長T Long</button>
-                                <button onClick={()=>setCatalogTab('sweatshirt')} className={`tab-btn ${catalogTab==='sweatshirt'?'active':''}`}>衛衣 Hoodie</button>
+                                <button onClick={()=>setCatalogTab('all')} className={`tab-btn ${catalogTab==='all'?'active':''}`}>全部</button>
+                                <button onClick={()=>setCatalogTab('short_t')} className={`tab-btn ${catalogTab==='short_t'?'active':''}`}>短T</button>
+                                <button onClick={()=>setCatalogTab('long_t')} className={`tab-btn ${catalogTab==='long_t'?'active':''}`}>長T</button>
+                                <button onClick={()=>setCatalogTab('sweatshirt')} className={`tab-btn ${catalogTab==='sweatshirt'?'active':''}`}>衛衣</button>
+                                <button onClick={()=>setCatalogTab('bottom')} className={`tab-btn ${catalogTab==='bottom'?'active':''}`}>下身</button>
+                                <button onClick={()=>setCatalogTab('shoes')} className={`tab-btn ${catalogTab==='shoes'?'active':''}`}>鞋履</button>
                             </div>
 
                             {/* 3-Col Grid */}
@@ -452,7 +453,11 @@
                                 <div className="catalog-grid">
                                     {filteredCatalog.map(item => (
                                         <div key={item.uid} className="grid-item" onClick={() => setDetailItem(item)}>
-                                            <img src={item.srcDisplay} alt={item.id} onError={(e)=>e.target.style.display='none'} />
+                                            <img 
+                                                src={item.srcDisplay} 
+                                                alt={item.id} 
+                                                onError={(e) => handleGridImgError(e, item)} 
+                                            />
                                             <div className="absolute bottom-1 right-1 text-[8px] text-gray-400">{item.id}</div>
                                         </div>
                                     ))}
@@ -469,11 +474,11 @@
                             <div className="style-preview">
                                 <div className="ghost-canvas-container h-full w-full bg-white">
                                     {/* Layers Z-Index: Shoes(10), Bottom(20), Tops(30) */}
-                                    {outfit.shoes && <img src={outfit.shoes.srcGhost} className="ghost-layer z-10" />}
-                                    {outfit.bottom && <img src={outfit.bottom.srcGhost} className="ghost-layer z-20" />}
-                                    {outfit.short_t && <img src={outfit.short_t.srcGhost} className="ghost-layer z-30" />}
-                                    {outfit.long_t && <img src={outfit.long_t.srcGhost} className="ghost-layer z-30" />}
-                                    {outfit.sweatshirt && <img src={outfit.sweatshirt.srcGhost} className="ghost-layer z-30" />}
+                                    {outfit.shoes && <img src={outfit.shoes.srcGhost} className="ghost-layer z-10" onError={(e)=>handleGridImgError(e, outfit.shoes)} />}
+                                    {outfit.bottom && <img src={outfit.bottom.srcGhost} className="ghost-layer z-20" onError={(e)=>handleGridImgError(e, outfit.bottom)} />}
+                                    {outfit.short_t && <img src={outfit.short_t.srcGhost} className="ghost-layer z-30" onError={(e)=>handleGridImgError(e, outfit.short_t)} />}
+                                    {outfit.long_t && <img src={outfit.long_t.srcGhost} className="ghost-layer z-30" onError={(e)=>handleGridImgError(e, outfit.long_t)} />}
+                                    {outfit.sweatshirt && <img src={outfit.sweatshirt.srcGhost} className="ghost-layer z-30" onError={(e)=>handleGridImgError(e, outfit.sweatshirt)} />}
                                     
                                     {(!outfit.bottom && !outfit.shoes && !outfit.short_t && !outfit.long_t && !outfit.sweatshirt) && (
                                         <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-300">
@@ -498,13 +503,12 @@
                             {/* Bottom: Thumbnails */}
                             <div className="style-thumbnails">
                                 {styleThumbnails.map(item => (
-                                    <div key={item.uid} className="thumb-item" onClick={() => handleManualStyle(item)}>
-                                        <img src={item.srcDisplay} alt={item.id} />
+                                    <div key={item.uid} className="thumb-item" data-cat={item.catId} onClick={() => handleManualStyle(item)}>
+                                        <img src={item.srcDisplay} alt={item.id} onError={(e)=>handleGridImgError(e, item)} />
                                     </div>
                                 ))}
                             </div>
                             
-                            {/* Spacer for Bottom Nav */}
                             <div className="h-[70px] bg-white"></div>
                         </div>
                     )}
