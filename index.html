@@ -1,14 +1,14 @@
-<!-- DbSSTUDIO-Showroom.v3.2.html -->
+<!-- DbSSTUDIO-Showroom.v3.3.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DbSSTUDIO v3.2 - Ultimate Archive 2026</title>
+    <title>DbSSTUDIO v3.3 - Ultimate Archive 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [DbSSTUDIO v3.2 - ID Correction & Pro Layout] */
+        /* [DbSSTUDIO v3.3 - Integrity & Flow] */
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             -webkit-font-smoothing: antialiased; 
@@ -107,24 +107,36 @@
         .style-controls {
             padding: 8px 12px;
             border-top: 1px solid #f0f0f0;
-            border-bottom: 1px solid #f0f0f0;
-            display: flex; justify-content: space-between; align-items: center;
-            background: #fff;
+            display: flex; flex-direction: column; gap: 8px;
+            background: #fff; z-index: 30;
         }
-        .cat-switch { display: flex; gap: 4px; }
+        .cat-switch { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .cat-group { display: flex; gap: 4px; }
+        
         .cat-btn {
             padding: 6px 12px; border-radius: 99px;
             font-size: 10px; font-weight: 600;
             background: #f5f5f5; color: #888;
-            transition: all 0.2s;
+            transition: all 0.2s; cursor: pointer;
         }
         .cat-btn.active { background: #000; color: #fff; }
+
+        .sub-filter {
+            display: flex; gap: 6px; padding-bottom: 4px;
+            overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
+        }
+        .sub-btn {
+            font-size: 9px; padding: 4px 10px; border: 1px solid #eee; border-radius: 99px;
+            color: #999; transition: all 0.2s; white-space: nowrap; cursor: pointer;
+        }
+        .sub-btn.active { border-color: #000; color: #000; background: #fff; font-weight: 600; }
 
         /* Style Thumbnails */
         .style-thumbnails {
             height: 100px; background: #fff;
             display: flex; gap: 8px; padding: 8px 12px;
             overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
+            border-top: 1px solid #f0f0f0;
         }
         .style-thumbnails::-webkit-scrollbar { display: none; }
         .thumb-item {
@@ -136,8 +148,8 @@
         .thumb-item[data-cat="shoes"] img { transform: scale(1.1); }
         .thumb-item.active { border-color: #000; background: #f9f9f9; }
         .thumb-item img { width: 100%; height: 100%; object-fit: contain; }
-
-        /* Detail Modal (Lightbox UI) */
+        
+        /* Detail Modal */
         .detail-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.99); z-index: 99999;
@@ -151,8 +163,7 @@
         }
         .detail-img {
             width: 150vw; max-width: none; height: auto;
-            transform: translateY(-5%);
-            object-fit: contain;
+            transform: translateY(-5%); object-fit: contain;
         }
         .detail-controls {
             padding: 24px; background: rgba(255,255,255,0.95);
@@ -189,13 +200,12 @@
             position: absolute; bottom: 100px; right: 20px;
             width: 48px; height: 48px; background: #000; color: #fff;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 90;
-            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 90; cursor: pointer;
         }
         .cart-badge {
-            position: absolute; top: 0; right: 0;
-            width: 16px; height: 16px; background: #FF3B30;
-            border-radius: 50%; font-size: 9px; display: flex; align-items: center; justify-content: center;
+            position: absolute; top: 0; right: 0; width: 16px; height: 16px; 
+            background: #FF3B30; border-radius: 50%; font-size: 9px; 
+            display: flex; align-items: center; justify-content: center;
         }
     </style>
 </head>
@@ -209,7 +219,7 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback } = React;
 
-        // --- 1. DATA CONFIG (v3.2 ID Rules) ---
+        // --- 1. DATA CONFIG (v3.3) ---
         const CATEGORIES = [
             { id: 'short_t', label: '短 T-Shirt', prefix: 'st', name: 'Cotton Tee' },
             { id: 'long_t', label: '長 T-Shirt', prefix: 'lt', name: 'Layering Long' },
@@ -237,7 +247,6 @@
 
         // --- COMPONENTS ---
 
-        // Inquiry List
         const InquiryCartModal = ({ list, onRemove, onClose }) => {
             const handleCheckout = () => {
                 if (list.length === 0) return;
@@ -269,42 +278,27 @@
             );
         };
 
-        // Detail Modal (Lightbox with UI)
         const DetailModal = ({ item, onClose, onAdd }) => {
             const [size, setSize] = useState(null);
-            
             return (
                 <div className="detail-modal">
                     <div className="absolute top-0 w-full p-4 flex justify-end z-20">
                         <button onClick={onClose} className="bg-white rounded-full p-2 shadow-md"><Icon name="x" className="w-6 h-6" /></button>
                     </div>
-                    
                     <div className="detail-image-area">
-                        <img src={item.srcDisplay} className="detail-img" alt={item.id} onError={(e)=>{ 
-                            if(e.target.src !== item.srcOriginal) e.target.src = item.srcOriginal; 
-                        }} />
+                        <img src={item.srcDisplay} className="detail-img" alt={item.id} onError={(e)=>{ if(e.target.src !== item.srcOriginal) e.target.src = item.srcOriginal; }} />
                     </div>
-
                     <div className="detail-controls">
                         <div className="flex justify-between items-center mb-4">
-                            <div>
-                                <h2 className="text-lg font-bold">{item.id}</h2>
-                                <p className="text-xs text-gray-500">{item.name}</p>
-                            </div>
+                            <div><h2 className="text-lg font-bold">{item.id}</h2><p className="text-xs text-gray-500">{item.name}</p></div>
                         </div>
-
                         <div className="flex gap-2 mb-6 justify-center">
                             {SIZES.map(s => (
                                 <button key={s} onClick={()=>setSize(s)} className={`size-btn ${size===s?'active':''}`}>{s}</button>
                             ))}
                         </div>
-
-                        <button 
-                            onClick={() => { if(!size) return alert('請選擇尺寸'); onAdd(item, size); }}
-                            className="w-full bg-black text-white py-4 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2"
-                        >
-                            <span>加入清單</span>
-                            <Icon name="plus" className="w-3 h-3" />
+                        <button onClick={() => { if(!size) return alert('請選擇尺寸'); onAdd(item, size); }} className="w-full bg-black text-white py-4 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+                            <span>加入清單</span><Icon name="plus" className="w-3 h-3" />
                         </button>
                     </div>
                 </div>
@@ -315,25 +309,25 @@
         const App = () => {
             const [activeTab, setActiveTab] = useState('new');
             const [catalogTab, setCatalogTab] = useState('all');
-            const [styleCategory, setStyleCategory] = useState('tops'); 
             
+            // Style Page States
+            const [styleCategory, setStyleCategory] = useState('tops'); 
+            const [styleSubFilter, setStyleSubFilter] = useState('all'); // v3.3 New Sub-filter
+
             const [detailItem, setDetailItem] = useState(null);
             const [inquiryList, setInquiryList] = useState([]);
             const [showCart, setShowCart] = useState(false);
 
-            // Outfit
             const [outfit, setOutfit] = useState({ short_t: null, long_t: null, sweatshirt: null, bottom: null, shoes: null });
 
-            // Catalog Data Generation (v3.2 3-Digit Logic)
+            // Catalog Generation (v3.3 Expanded to 20)
             const catalog = useMemo(() => {
                 let items = [];
                 CATEGORIES.forEach(cat => {
-                    for(let i=1; i<=15; i++) {
+                    for(let i=1; i<=20; i++) { // Increased limit
                         let baseName = '';
-                        // 3-Digit Padding
                         const idSuffix = String(i).padStart(3, '0');
 
-                        // Logic for Shoes/Bottoms vs Tops
                         if (cat.id === 'shoes') {
                             if (i <= 5) baseName = `s${idSuffix}`;
                             else if (i <= 10) baseName = `w${String(i-5).padStart(3, '0')}`;
@@ -344,7 +338,6 @@
                             baseName = `${cat.prefix}${idSuffix}`;
                         }
 
-                        // Paths: Display(_d), Ghost(_g), Fallback(original)
                         const d_src = `${baseName}_d.png`;
                         const g_src = `${baseName}_g.png`;
                         const o_src = `${baseName}.png`;
@@ -364,17 +357,28 @@
                 return items;
             }, []);
 
+            // Catalog Filter
             const filteredCatalog = useMemo(() => {
                 if (catalogTab === 'all') return catalog;
                 return catalog.filter(i => i.catId === catalogTab);
             }, [catalog, catalogTab]);
 
+            // Style Thumbnail Logic (v3.3 Sub-filters)
             const styleThumbnails = useMemo(() => {
-                if (styleCategory === 'tops') return catalog.filter(i => ['short_t', 'long_t', 'sweatshirt'].includes(i.catId));
-                if (styleCategory === 'bottoms') return catalog.filter(i => i.catId === 'bottom');
-                if (styleCategory === 'shoes') return catalog.filter(i => i.catId === 'shoes');
-                return [];
-            }, [catalog, styleCategory]);
+                let pool = [];
+                if (styleCategory === 'tops') {
+                    if (styleSubFilter === 'all') {
+                        pool = catalog.filter(i => ['short_t', 'long_t', 'sweatshirt'].includes(i.catId));
+                    } else {
+                        pool = catalog.filter(i => i.catId === styleSubFilter);
+                    }
+                } else if (styleCategory === 'bottoms') {
+                    pool = catalog.filter(i => i.catId === 'bottom');
+                } else if (styleCategory === 'shoes') {
+                    pool = catalog.filter(i => i.catId === 'shoes');
+                }
+                return pool;
+            }, [catalog, styleCategory, styleSubFilter]);
 
             const addToInquiry = (item, size) => {
                 setInquiryList(prev => [...prev, { ...item, size }]);
@@ -418,6 +422,11 @@
                 }
             };
 
+            // v3.3 Fix: Hide broken thumbnails completely
+            const handleThumbError = (e) => {
+                e.target.parentElement.style.display = 'none';
+            };
+
             return (
                 <div className="app-container">
                     
@@ -427,7 +436,7 @@
                             <div className="brand-header">
                                 <h1 className="text-xl font-bold tracking-tighter text-center">
                                     DbSSTUDIO
-                                    <span className="ml-2 font-light text-xs text-gray-400 tracking-widest block mt-1">v3.2 ARCHIVE</span>
+                                    <span className="ml-2 font-light text-xs text-gray-400 tracking-widest block mt-1">v3.3 ARCHIVE</span>
                                 </h1>
                             </div>
 
@@ -444,11 +453,7 @@
                                 <div className="catalog-grid">
                                     {filteredCatalog.map(item => (
                                         <div key={item.uid} className="grid-item" onClick={() => setDetailItem(item)}>
-                                            <img 
-                                                src={item.srcDisplay} 
-                                                alt={item.id} 
-                                                onError={(e) => handleGridImgError(e, item)} 
-                                            />
+                                            <img src={item.srcDisplay} alt={item.id} onError={(e) => handleGridImgError(e, item)} />
                                             <div className="absolute bottom-1 right-1 text-[8px] text-gray-400">{item.id}</div>
                                         </div>
                                     ))}
@@ -479,19 +484,30 @@
 
                             <div className="style-controls">
                                 <div className="cat-switch">
-                                    <button onClick={()=>setStyleCategory('tops')} className={`cat-btn ${styleCategory==='tops'?'active':''}`}>TOPS</button>
-                                    <button onClick={()=>setStyleCategory('bottoms')} className={`cat-btn ${styleCategory==='bottoms'?'active':''}`}>BOTTOMS</button>
-                                    <button onClick={()=>setStyleCategory('shoes')} className={`cat-btn ${styleCategory==='shoes'?'active':''}`}>SHOES</button>
+                                    <div className="cat-group">
+                                        <button onClick={()=>{setStyleCategory('tops'); setStyleSubFilter('all');}} className={`cat-btn ${styleCategory==='tops'?'active':''}`}>TOPS</button>
+                                        <button onClick={()=>setStyleCategory('bottoms')} className={`cat-btn ${styleCategory==='bottoms'?'active':''}`}>BOTTOMS</button>
+                                        <button onClick={()=>setStyleCategory('shoes')} className={`cat-btn ${styleCategory==='shoes'?'active':''}`}>SHOES</button>
+                                    </div>
+                                    <button onClick={handleShuffle} className="p-2 rounded-full hover:bg-gray-100 z-50">
+                                        <Icon name="dice" className="w-5 h-5 text-black" />
+                                    </button>
                                 </div>
-                                <button onClick={handleShuffle} className="p-2 rounded-full hover:bg-gray-100">
-                                    <Icon name="dice" className="w-5 h-5 text-black" />
-                                </button>
+                                {/* Sub-filters for Tops */}
+                                {styleCategory === 'tops' && (
+                                    <div className="sub-filter animate-fade-in">
+                                        <button onClick={()=>setStyleSubFilter('all')} className={`sub-btn ${styleSubFilter==='all'?'active':''}`}>全部</button>
+                                        <button onClick={()=>setStyleSubFilter('short_t')} className={`sub-btn ${styleSubFilter==='short_t'?'active':''}`}>短T</button>
+                                        <button onClick={()=>setStyleSubFilter('long_t')} className={`sub-btn ${styleSubFilter==='long_t'?'active':''}`}>長T</button>
+                                        <button onClick={()=>setStyleSubFilter('sweatshirt')} className={`sub-btn ${styleSubFilter==='sweatshirt'?'active':''}`}>衛衣</button>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="style-thumbnails">
                                 {styleThumbnails.map(item => (
                                     <div key={item.uid} className="thumb-item" data-cat={item.catId} onClick={() => handleManualStyle(item)}>
-                                        <img src={item.srcDisplay} alt={item.id} onError={(e)=>handleGridImgError(e, item)} />
+                                        <img src={item.srcDisplay} alt={item.id} onError={handleThumbError} />
                                     </div>
                                 ))}
                             </div>
