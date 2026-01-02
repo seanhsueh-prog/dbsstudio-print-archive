@@ -1,14 +1,14 @@
-<!-- DbSSTUDIO-Showroom.v3.1.html -->
+<!-- DbSSTUDIO-Showroom.v3.2.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DbSSTUDIO v3.1 - Ultimate Archive 2026</title>
+    <title>DbSSTUDIO v3.2 - Ultimate Archive 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [DbSSTUDIO v3.1 - Ultimate Professional] */
+        /* [DbSSTUDIO v3.2 - ID Correction & Pro Layout] */
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             -webkit-font-smoothing: antialiased; 
@@ -49,7 +49,7 @@
             background: #fff; text-align: center;
         }
 
-        /* 3-Column Grid Layout */
+        /* 3-Column Grid */
         .catalog-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -73,7 +73,7 @@
         }
         .grid-item:active img { transform: scale(0.95); }
 
-        /* Sticky Header Tabs */
+        /* Sticky Tabs */
         .sticky-tabs {
             position: sticky; top: 0; z-index: 40;
             background: rgba(255,255,255,0.98);
@@ -91,7 +91,7 @@
         }
         .tab-btn.active { color: #000; border-bottom-color: #000; }
 
-        /* Style Page Layout */
+        /* Style Page */
         .style-layout { display: flex; flex-direction: column; height: 100%; }
         
         .style-preview {
@@ -120,7 +120,7 @@
         }
         .cat-btn.active { background: #000; color: #fff; }
 
-        /* Thumbnails */
+        /* Style Thumbnails */
         .style-thumbnails {
             height: 100px; background: #fff;
             display: flex; gap: 8px; padding: 8px 12px;
@@ -133,9 +133,7 @@
             display: flex; align-items: center; justify-content: center;
             padding: 4px; cursor: pointer; transition: border-color 0.2s;
         }
-        /* Make shoes slightly larger in thumb */
         .thumb-item[data-cat="shoes"] img { transform: scale(1.1); }
-        
         .thumb-item.active { border-color: #000; background: #f9f9f9; }
         .thumb-item img { width: 100%; height: 100%; object-fit: contain; }
 
@@ -211,7 +209,7 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback } = React;
 
-        // --- 1. DATA & LOGIC ---
+        // --- 1. DATA CONFIG (v3.2 ID Rules) ---
         const CATEGORIES = [
             { id: 'short_t', label: '短 T-Shirt', prefix: 'st', name: 'Cotton Tee' },
             { id: 'long_t', label: '長 T-Shirt', prefix: 'lt', name: 'Layering Long' },
@@ -239,7 +237,7 @@
 
         // --- COMPONENTS ---
 
-        // 1. Inquiry List Modal
+        // Inquiry List
         const InquiryCartModal = ({ list, onRemove, onClose }) => {
             const handleCheckout = () => {
                 if (list.length === 0) return;
@@ -271,16 +269,10 @@
             );
         };
 
-        // 2. Detail Modal (Shocking Lightbox with Fallback)
+        // Detail Modal (Lightbox with UI)
         const DetailModal = ({ item, onClose, onAdd }) => {
             const [size, setSize] = useState(null);
             
-            const handleImgError = (e) => {
-                if (e.target.src !== item.srcOriginal) {
-                    e.target.src = item.srcOriginal;
-                }
-            };
-
             return (
                 <div className="detail-modal">
                     <div className="absolute top-0 w-full p-4 flex justify-end z-20">
@@ -288,18 +280,17 @@
                     </div>
                     
                     <div className="detail-image-area">
-                        <img 
-                            src={item.srcDisplay} 
-                            className="detail-img" 
-                            alt={item.id}
-                            onError={handleImgError} 
-                        />
+                        <img src={item.srcDisplay} className="detail-img" alt={item.id} onError={(e)=>{ 
+                            if(e.target.src !== item.srcOriginal) e.target.src = item.srcOriginal; 
+                        }} />
                     </div>
 
                     <div className="detail-controls">
-                        <div className="mb-4">
-                            <h2 className="text-lg font-bold">{item.id}</h2>
-                            <p className="text-xs text-gray-500">{item.name}</p>
+                        <div className="flex justify-between items-center mb-4">
+                            <div>
+                                <h2 className="text-lg font-bold">{item.id}</h2>
+                                <p className="text-xs text-gray-500">{item.name}</p>
+                            </div>
                         </div>
 
                         <div className="flex gap-2 mb-6 justify-center">
@@ -320,7 +311,7 @@
             );
         };
 
-        // --- MAIN APPLICATION ---
+        // --- MAIN APP ---
         const App = () => {
             const [activeTab, setActiveTab] = useState('new');
             const [catalogTab, setCatalogTab] = useState('all');
@@ -330,27 +321,33 @@
             const [inquiryList, setInquiryList] = useState([]);
             const [showCart, setShowCart] = useState(false);
 
+            // Outfit
             const [outfit, setOutfit] = useState({ short_t: null, long_t: null, sweatshirt: null, bottom: null, shoes: null });
 
-            // Data Generation (v3.1 with Fallback Sources)
+            // Catalog Data Generation (v3.2 3-Digit Logic)
             const catalog = useMemo(() => {
                 let items = [];
                 CATEGORIES.forEach(cat => {
                     for(let i=1; i<=15; i++) {
-                        let d_src = '', g_src = '', baseName = '', o_src = '';
+                        let baseName = '';
+                        // 3-Digit Padding
+                        const idSuffix = String(i).padStart(3, '0');
 
+                        // Logic for Shoes/Bottoms vs Tops
                         if (cat.id === 'shoes') {
-                            if (i <= 5) baseName = `s0${i}`;
-                            else if (i <= 10) baseName = `w${i-5}`;
-                            else baseName = `x0${i-10}`;
-                            d_src = `${baseName}.png`; g_src = `${baseName}.png`; o_src = `${baseName}.png`;
+                            if (i <= 5) baseName = `s${idSuffix}`;
+                            else if (i <= 10) baseName = `w${String(i-5).padStart(3, '0')}`;
+                            else baseName = `x${String(i-10).padStart(3, '0')}`;
                         } else if (cat.id === 'bottom') {
-                            baseName = `b${i}`;
-                            d_src = `${baseName}.png`; g_src = `${baseName}.png`; o_src = `${baseName}.png`;
+                            baseName = `b${idSuffix}`;
                         } else {
-                            baseName = `${cat.prefix}${i}`;
-                            d_src = `${baseName}_d.png`; g_src = `${baseName}_g.png`; o_src = `${baseName}.png`;
+                            baseName = `${cat.prefix}${idSuffix}`;
                         }
+
+                        // Paths: Display(_d), Ghost(_g), Fallback(original)
+                        const d_src = `${baseName}_d.png`;
+                        const g_src = `${baseName}_g.png`;
+                        const o_src = `${baseName}.png`;
 
                         items.push({
                             uid: `${cat.id}-${i}`,
@@ -359,7 +356,7 @@
                             name: cat.name,
                             srcDisplay: `./${d_src}`,
                             srcGhost: `./${g_src}`,
-                            srcOriginal: `./${o_src}`, // Fallback
+                            srcOriginal: `./${o_src}`,
                             slot: cat.id
                         });
                     }
@@ -367,13 +364,11 @@
                 return items;
             }, []);
 
-            // Helper: Filter Catalog
             const filteredCatalog = useMemo(() => {
                 if (catalogTab === 'all') return catalog;
                 return catalog.filter(i => i.catId === catalogTab);
             }, [catalog, catalogTab]);
 
-            // Helper: Filter Style Thumbnails
             const styleThumbnails = useMemo(() => {
                 if (styleCategory === 'tops') return catalog.filter(i => ['short_t', 'long_t', 'sweatshirt'].includes(i.catId));
                 if (styleCategory === 'bottoms') return catalog.filter(i => i.catId === 'bottom');
@@ -415,30 +410,27 @@
                 });
             };
 
-            // Image Error Handler for Grid
             const handleGridImgError = (e, item) => {
                 if (e.target.src !== new URL(item.srcOriginal, window.location.href).href) {
                     e.target.src = item.srcOriginal;
                 } else {
-                    e.target.style.display = 'none'; // Both failed
+                    e.target.style.display = 'none'; 
                 }
             };
 
             return (
                 <div className="app-container">
                     
-                    {/* PAGE 1: NEW ARRIVALS */}
+                    {/* PAGE 1: CATALOG */}
                     {activeTab === 'new' && (
                         <>
-                            {/* Brand Header v3.1 */}
                             <div className="brand-header">
                                 <h1 className="text-xl font-bold tracking-tighter text-center">
                                     DbSSTUDIO
-                                    <span className="ml-2 font-light text-xs text-gray-400 tracking-widest block mt-1">v3.1 ARCHIVE</span>
+                                    <span className="ml-2 font-light text-xs text-gray-400 tracking-widest block mt-1">v3.2 ARCHIVE</span>
                                 </h1>
                             </div>
 
-                            {/* Sticky Tabs */}
                             <div className="sticky-tabs">
                                 <button onClick={()=>setCatalogTab('all')} className={`tab-btn ${catalogTab==='all'?'active':''}`}>全部</button>
                                 <button onClick={()=>setCatalogTab('short_t')} className={`tab-btn ${catalogTab==='short_t'?'active':''}`}>短T</button>
@@ -448,7 +440,6 @@
                                 <button onClick={()=>setCatalogTab('shoes')} className={`tab-btn ${catalogTab==='shoes'?'active':''}`}>鞋履</button>
                             </div>
 
-                            {/* 3-Col Grid */}
                             <div className="content-area">
                                 <div className="catalog-grid">
                                     {filteredCatalog.map(item => (
@@ -467,13 +458,11 @@
                         </>
                     )}
 
-                    {/* PAGE 2: STYLE EDITOR */}
+                    {/* PAGE 2: STYLE */}
                     {activeTab === 'style' && (
                         <div className="style-layout">
-                            {/* Top: Ghost Preview */}
                             <div className="style-preview">
                                 <div className="ghost-canvas-container h-full w-full bg-white">
-                                    {/* Layers Z-Index: Shoes(10), Bottom(20), Tops(30) */}
                                     {outfit.shoes && <img src={outfit.shoes.srcGhost} className="ghost-layer z-10" onError={(e)=>handleGridImgError(e, outfit.shoes)} />}
                                     {outfit.bottom && <img src={outfit.bottom.srcGhost} className="ghost-layer z-20" onError={(e)=>handleGridImgError(e, outfit.bottom)} />}
                                     {outfit.short_t && <img src={outfit.short_t.srcGhost} className="ghost-layer z-30" onError={(e)=>handleGridImgError(e, outfit.short_t)} />}
@@ -488,7 +477,6 @@
                                 </div>
                             </div>
 
-                            {/* Middle: Controls */}
                             <div className="style-controls">
                                 <div className="cat-switch">
                                     <button onClick={()=>setStyleCategory('tops')} className={`cat-btn ${styleCategory==='tops'?'active':''}`}>TOPS</button>
@@ -500,7 +488,6 @@
                                 </button>
                             </div>
 
-                            {/* Bottom: Thumbnails */}
                             <div className="style-thumbnails">
                                 {styleThumbnails.map(item => (
                                     <div key={item.uid} className="thumb-item" data-cat={item.catId} onClick={() => handleManualStyle(item)}>
@@ -528,7 +515,6 @@
                         </div>
                     )}
 
-                    {/* Global Elements */}
                     {inquiryList.length > 0 && (
                         <div className="floating-cart" onClick={() => setShowCart(true)}>
                             <Icon name="cart" className="w-5 h-5" />
@@ -536,14 +522,12 @@
                         </div>
                     )}
 
-                    {/* Bottom Nav */}
                     <div className="bottom-nav">
                         <div onClick={() => setActiveTab('new')} className={`nav-item ${activeTab === 'new' ? 'active' : ''}`}><Icon name="home" className="w-5 h-5" /><span>目錄</span></div>
                         <div onClick={() => setActiveTab('style')} className={`nav-item ${activeTab === 'style' ? 'active' : ''}`}><Icon name="hanger" className="w-5 h-5" /><span>搭配</span></div>
                         <div onClick={() => setActiveTab('contact')} className={`nav-item ${activeTab === 'contact' ? 'active' : ''}`}><Icon name="chat" className="w-5 h-5" /><span>關於</span></div>
                     </div>
 
-                    {/* Modals */}
                     {detailItem && <DetailModal item={detailItem} onClose={() => setDetailItem(null)} onAdd={addToInquiry} />}
                     {showCart && <InquiryCartModal list={inquiryList} onRemove={removeFromInquiry} onClose={() => setShowCart(false)} />}
 
