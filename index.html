@@ -1,21 +1,21 @@
-<!-- DbSSTUDIO-Showroom.v2.3.html -->
+<!-- DbSSTUDIO-Showroom.v3.0.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DbSSTUDIO v2.3 - Ultimate Archive 2026</title>
+    <title>DbSSTUDIO v3.0 - Professional Archive 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [DbSSTUDIO v2.3 - Dynamic Viewport & Stable UI] */
+        /* [DbSSTUDIO v3.0 - Ultimate Professional] */
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             -webkit-font-smoothing: antialiased; 
             background-color: #F9F9F9; 
             color: #111; 
             margin: 0;
-            height: 100dvh; /* v2.3 Fix: Dynamic Viewport Height */
+            height: 100dvh; /* Mobile Address Bar Fix */
             overflow: hidden; 
             display: flex;
             justify-content: center; 
@@ -24,15 +24,16 @@
         
         .app-container {
             width: 100%; max-width: 480px; height: 100dvh; 
-            background-color: #F9F9F9; position: relative;
-            box-shadow: 0 0 40px rgba(0,0,0,0.03);
+            background-color: #fff; position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
             display: flex; flex-direction: column; overflow: hidden;
         }
 
         .content-area {
-            flex: 1; overflow-y: auto; padding-bottom: 90px;
+            flex: 1; overflow-y: auto; padding-bottom: 80px;
             -ms-overflow-style: none; scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
+            background-color: #fff;
         }
         .content-area::-webkit-scrollbar { display: none; }
         
@@ -42,25 +43,56 @@
         }
         .animate-fade-in { animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-        /* Product Card */
-        .product-card {
-            background: #fff; margin-bottom: 32px; border: 1px solid #eeeeee;
+        /* 3-Column Grid Layout */
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background-color: #f0f0f0; /* Grid lines */
+            padding-bottom: 20px;
         }
-        .product-card.hidden-card { display: none !important; }
-
-        .size-btn {
-            width: 32px; height: 32px; border-radius: 50%;
-            border: 1px solid #e5e5e5; display: flex; align-items: center;
-            justify-content: center; font-size: 11px; font-weight: 500;
-            color: #999; transition: all 0.2s; cursor: pointer; background: #fff;
+        .grid-item {
+            background-color: #fff;
+            aspect-ratio: 3/4;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .size-btn:hover { border-color: #000; color: #000; }
-        .size-btn.active { background: #000; color: #fff; border-color: #000; }
+        .grid-item img {
+            width: 100%; height: 100%; object-fit: contain; padding: 4px;
+            transition: transform 0.2s;
+        }
+        .grid-item:active img { transform: scale(0.95); }
 
-        /* Ghost Engine */
-        .ghost-canvas-container {
-            position: relative; width: 100%; aspect-ratio: 3.5 / 5; 
-            background-color: #fff; overflow: hidden; margin-bottom: 12px;
+        /* Sticky Header Tabs */
+        .sticky-tabs {
+            position: sticky; top: 0; z-index: 40;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #eee;
+            display: flex; overflow-x: auto;
+            -ms-overflow-style: none; scrollbar-width: none;
+        }
+        .sticky-tabs::-webkit-scrollbar { display: none; }
+        .tab-btn {
+            padding: 12px 16px;
+            font-size: 11px; font-weight: 600;
+            color: #999; whitespace: nowrap;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-btn.active { color: #000; border-bottom-color: #000; }
+
+        /* Style Page Layout */
+        .style-layout { display: flex; flex-direction: column; height: 100%; }
+        
+        /* 1. Preview Area (Ghost) */
+        .style-preview {
+            flex: 1; position: relative;
+            background: #fff; /* Pure background */
+            overflow: hidden;
         }
         .ghost-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -68,72 +100,102 @@
             pointer-events: none; transition: opacity 0.3s ease-in-out;
         }
 
-        /* Bottom Navigation - Fixed Z-Index v2.3 */
+        /* 2. Control Bar */
+        .style-controls {
+            padding: 8px 16px;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex; justify-content: space-between; align-items: center;
+            background: #fff;
+        }
+        .cat-switch {
+            display: flex; gap: 4px;
+        }
+        .cat-btn {
+            padding: 6px 12px; border-radius: 99px;
+            font-size: 10px; font-weight: 600;
+            background: #f5f5f5; color: #888;
+            transition: all 0.2s;
+        }
+        .cat-btn.active { background: #000; color: #fff; }
+
+        /* 3. Horizontal Thumbnails */
+        .style-thumbnails {
+            height: 100px;
+            background: #fff;
+            display: flex; gap: 8px; padding: 8px 12px;
+            overflow-x: auto;
+            -ms-overflow-style: none; scrollbar-width: none;
+        }
+        .style-thumbnails::-webkit-scrollbar { display: none; }
+        .thumb-item {
+            min-width: 70px; height: 100%;
+            border: 1px solid #eee; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 4px; cursor: pointer; transition: border-color 0.2s;
+        }
+        .thumb-item.active { border-color: #000; background: #f9f9f9; }
+        .thumb-item img { width: 100%; height: 100%; object-fit: contain; }
+
+        /* Detail Modal (Shocking Lightbox with UI) */
+        .detail-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.99); z-index: 99999;
+            display: flex; flex-direction: column;
+            animation: fade-in 0.25s ease-out;
+        }
+        .detail-image-area {
+            flex: 1; overflow: auto; position: relative;
+            display: flex; justify-content: center;
+        }
+        .detail-img {
+            width: 150vw; max-width: none; height: auto;
+            transform: translateY(-5%);
+            object-fit: contain;
+        }
+        .detail-controls {
+            padding: 20px; background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #eee;
+        }
+
+        .size-btn {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: 1px solid #e5e5e5; display: flex; align-items: center;
+            justify-content: center; font-size: 11px; font-weight: 500;
+            color: #999; transition: all 0.2s; background: #fff;
+        }
+        .size-btn.active { background: #000; color: #fff; border-color: #000; }
+
+        /* Bottom Nav */
         .bottom-nav {
             position: absolute; bottom: 0; left: 0; width: 100%;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(12px); border-top: 1px solid #f0f0f0;
             display: flex; justify-content: space-around;
-            padding: 16px 0 32px 0; z-index: 100; /* Ensure visibility */
+            padding: 12px 0 28px 0; z-index: 100;
         }
         .nav-item {
-            font-size: 11px; font-weight: 600; color: #bbb;
-            letter-spacing: 0.5px; cursor: pointer; text-align: center;
+            font-size: 9px; font-weight: 600; color: #ccc;
+            text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; text-align: center;
             transition: color 0.3s; display: flex; flex-direction: column;
             align-items: center; gap: 4px;
         }
         .nav-item.active { color: #000; }
-        
-        /* Lightbox - Ultimate Zoom + Independent Layer */
-        .lightbox-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.99); 
-            z-index: 99999; /* Highest Level */
-            animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            overflow: auto; 
-            -webkit-overflow-scrolling: touch;
-        }
-        .lightbox-scroll-wrapper {
-            min-width: 100%; min-height: 100%;
-            display: flex; justify-content: center; align-items: flex-start;
-            padding-top: 5vh; padding-bottom: 10vh;
-        }
-        .lightbox-img {
-            width: 150vw !important; max-width: none !important;
-            height: auto !important; transform: translateY(-5%);
-            box-shadow: 0 40px 80px rgba(0,0,0,0.1); cursor: grab;
-        }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-            z-index: 90; display: flex; align-items: center; justify-content: center;
-            padding: 20px;
-        }
-        .modal-content {
-            background: #fff; width: 100%; max-width: 360px; padding: 24px;
-            border-radius: 2px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-            max-height: 80vh; overflow-y: auto;
-        }
-
-        .btn-try { background-color: #fff; border: 1px solid #000; color: #000; transition: all 0.2s; }
-        .btn-try:hover { background-color: #f5f5f5; }
 
         /* Floating Cart */
         .floating-cart {
             position: absolute; bottom: 100px; right: 20px;
-            width: 50px; height: 50px; background: #000; color: #fff;
+            width: 48px; height: 48px; background: #000; color: #fff;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.25); z-index: 40;
-            cursor: pointer; transition: transform 0.2s;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 90;
+            cursor: pointer;
         }
-        .floating-cart:active { transform: scale(0.9); }
         .cart-badge {
-            position: absolute; top: -2px; right: -2px;
-            background: #FF3B30; color: #fff; font-size: 10px; font-weight: bold;
-            width: 18px; height: 18px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
+            position: absolute; top: 0; right: 0;
+            width: 16px; height: 16px; background: #FF3B30;
+            border-radius: 50%; font-size: 9px; display: flex; align-items: center; justify-content: center;
         }
     </style>
 </head>
@@ -147,13 +209,17 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback } = React;
 
-        // --- CONFIG ---
+        // --- 1. DATA & LOGIC ---
+        // Naming Convention: 
+        // Display: {prefix}{i}_d.png (Fallbacks to {prefix}{i}.png)
+        // Ghost:   {prefix}{i}_g.png (Fallbacks to {prefix}{i}.png)
+        
         const CATEGORIES = [
-            { id: 'short_t', label: '短袖 T-Shirt', prefix: 'st', name: 'Essential Cotton Tee' },
-            { id: 'long_t', label: '長袖 T-Shirt', prefix: 'lt', name: 'Layering Long Tee' },
-            { id: 'sweatshirt', label: '衛衣 / 帽T', prefix: 'sw', name: 'Heavyweight Hoodie' },
-            { id: 'bottom', label: '下身系列', prefix: 'b', name: 'Classic Trousers' },
-            { id: 'shoes', label: '鞋履系列', prefix: 's', name: 'Leather Derby' }
+            { id: 'short_t', label: '短 T-Shirt', prefix: 'st', name: 'Cotton Tee' },
+            { id: 'long_t', label: '長 T-Shirt', prefix: 'lt', name: 'Layering Long' },
+            { id: 'sweatshirt', label: '衛衣 Hoodie', prefix: 'sw', name: 'Heavyweight' },
+            { id: 'bottom', label: '下身 Bottoms', prefix: 'b', name: 'Trousers' },
+            { id: 'shoes', label: '鞋履 Shoes', prefix: 's', name: 'Footwear' }
         ];
         const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
         const LINE_ID = "@dbsstudio"; 
@@ -161,14 +227,12 @@
         // --- ICONS ---
         const Icon = ({ name, className }) => {
             const icons = {
-                ruler: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2 12h20"/><path d="M4 12v3"/><path d="M8 12v3"/><path d="M12 12v3"/><path d="M16 12v3"/><path d="M20 12v3"/></svg>,
                 x: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
                 plus: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
                 dice: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/></svg>,
                 chat: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
                 home: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
                 hanger: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2a5 5 0 0 1 4.9 6H7.1a5 5 0 0 1 4.9-6Z"/><path d="M21 21H3V11c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v10Z"/></svg>,
-                eye: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
                 cart: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>,
                 trash: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             };
@@ -176,349 +240,313 @@
         };
 
         // --- COMPONENTS ---
-        
-        // 1. Size Guide
-        const SizeGuideModal = ({ category, onClose }) => {
-            const [imageError, setImageError] = useState(false);
-            const getSizeChartSrc = () => {
-                if (category === 'short_t') return './size-st.png';
-                if (category === 'long_t') return './size-lt.png';
-                if (category === 'sweatshirt') return './size-sw.png';
-                return ''; 
-            };
-            const src = getSizeChartSrc();
-            return (
-                <div className="modal-overlay animate-fade-in" onClick={onClose}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900">尺寸對照表</h3>
-                            <button onClick={onClose}><Icon name="x" className="w-5 h-5 text-gray-400 hover:text-black" /></button>
-                        </div>
-                        <div className="min-h-[200px] flex items-center justify-center bg-gray-50 rounded border border-gray-100 p-2">
-                            {!imageError && src ? (
-                                <img src={src} alt="Size Chart" className="w-full h-auto object-contain" onError={() => setImageError(true)} />
-                            ) : (
-                                <div className="text-center">
-                                    <p className="text-xs text-gray-400 font-medium">尺寸表上傳中</p>
-                                    <p className="text-[10px] text-gray-300 mt-1">Size chart coming soon</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
 
-        // 2. Lightbox (v2.3 Ultimate Zoom)
-        const Lightbox = ({ src, onClose }) => {
-            return (
-                <div className="lightbox-container" onClick={onClose}>
-                    <button className="absolute top-6 right-6 p-4 bg-black text-white rounded-full z-[100000] hover:scale-110 transition-transform shadow-lg sticky top-6 float-right mr-6 mt-6" onClick={onClose}>
-                        <Icon name="x" className="w-6 h-6" />
-                    </button>
-                    <div className="lightbox-scroll-wrapper">
-                        <img 
-                            src={src} 
-                            className="lightbox-img" 
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation(); 
-                            }} 
-                            alt="Detail Zoom"
-                        />
-                    </div>
-                </div>
-            );
-        };
-
-        // 3. Inquiry Cart
+        // 1. Inquiry List Modal
         const InquiryCartModal = ({ list, onRemove, onClose }) => {
             const handleCheckout = () => {
                 if (list.length === 0) return;
-                let msg = "您好，我想諮詢 DbSSTUDIO 2026 商品：\n";
+                let msg = "諮詢單：\n";
                 list.forEach((item, idx) => {
-                    msg += `${idx + 1}. ${item.name} (${item.id}) / ${item.size}\n`;
+                    msg += `${idx + 1}. ${item.id} (${item.size})\n`;
                 });
-                msg += "\n請協助確認庫存，謝謝。";
                 window.location.href = `https://line.me/R/oaMessage/${LINE_ID}/?${encodeURIComponent(msg)}`;
             };
 
             return (
-                <div className="modal-overlay animate-fade-in" onClick={onClose}>
-                    <div className="modal-content flex flex-col max-h-[80vh]" onClick={e => e.stopPropagation()}>
-                        <div className="flex justify-between items-center mb-6 border-b pb-4">
-                            <h3 className="text-sm font-bold uppercase tracking-widest">詢問清單 ({list.length})</h3>
-                            <button onClick={onClose}><Icon name="x" className="w-5 h-5 text-gray-400 hover:text-black" /></button>
+                <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in" onClick={onClose}>
+                    <div className="bg-white w-full max-w-xs rounded-lg p-6 flex flex-col max-h-[70vh]" onClick={e=>e.stopPropagation()}>
+                        <div className="flex justify-between items-center mb-4 border-b pb-2">
+                            <h3 className="font-bold text-sm">詢問清單</h3>
+                            <button onClick={onClose}><Icon name="x" className="w-5 h-5" /></button>
                         </div>
-                        
-                        <div className="flex-1 overflow-y-auto mb-6 pr-2">
-                            {list.length === 0 ? (
-                                <p className="text-center text-xs text-gray-400 py-8">清單目前是空的</p>
-                            ) : (
-                                <div className="space-y-4">
-                                    {list.map((item, idx) => (
-                                        <div key={idx} className="flex gap-3 items-start border-b border-gray-50 pb-3">
-                                            <img src={item.src} className="w-12 h-16 object-contain border border-gray-100 bg-gray-50" />
-                                            <div className="flex-1">
-                                                <p className="text-xs font-bold">{item.name}</p>
-                                                <p className="text-[10px] text-gray-400">{item.id} / 尺寸: {item.size}</p>
-                                            </div>
-                                            <button onClick={() => onRemove(idx)} className="text-gray-300 hover:text-red-500">
-                                                <Icon name="trash" className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    ))}
+                        <div className="flex-1 overflow-y-auto space-y-3 mb-4">
+                            {list.length===0 ? <p className="text-gray-400 text-xs text-center py-4">清單是空的</p> : list.map((item,i)=>(
+                                <div key={i} className="flex justify-between items-center text-xs">
+                                    <span>{item.id} / {item.size}</span>
+                                    <button onClick={()=>onRemove(i)} className="text-gray-400 hover:text-red-500"><Icon name="trash" className="w-4 h-4"/></button>
                                 </div>
-                            )}
+                            ))}
+                        </div>
+                        <button onClick={handleCheckout} disabled={list.length===0} className="w-full bg-black text-white py-3 rounded text-xs font-bold">送出詢問 (Line)</button>
+                    </div>
+                </div>
+            );
+        };
+
+        // 2. Detail Modal (Shocking Lightbox with UI)
+        const DetailModal = ({ item, onClose, onAdd }) => {
+            const [size, setSize] = useState(null);
+            
+            return (
+                <div className="detail-modal">
+                    <div className="absolute top-0 w-full p-4 flex justify-end z-20">
+                        <button onClick={onClose} className="bg-white rounded-full p-2 shadow-md"><Icon name="x" className="w-6 h-6" /></button>
+                    </div>
+                    
+                    <div className="detail-image-area">
+                        <img src={item.srcDisplay} className="detail-img" alt={item.id} />
+                    </div>
+
+                    <div className="detail-controls">
+                        <div className="flex justify-between items-center mb-4">
+                            <div>
+                                <h2 className="text-lg font-bold">{item.id}</h2>
+                                <p className="text-xs text-gray-500">{item.name}</p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-xs font-bold block">NT$ 1,280</span>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-2 mb-6 justify-center">
+                            {SIZES.map(s => (
+                                <button key={s} onClick={()=>setSize(s)} className={`size-btn ${size===s?'active':''}`}>{s}</button>
+                            ))}
                         </div>
 
                         <button 
-                            onClick={handleCheckout}
-                            disabled={list.length === 0}
-                            className={`w-full py-3.5 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 ${list.length > 0 ? 'bg-[#06C755] text-white hover:opacity-90' : 'bg-gray-100 text-gray-400'}`}
+                            onClick={() => { if(!size) return alert('請選擇尺寸'); onAdd(item, size); }}
+                            className="w-full bg-black text-white py-4 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2"
                         >
-                            <span>確認並開啟 Line</span>
-                            <Icon name="chat" className="w-4 h-4" />
+                            <span>加入清單</span>
+                            <Icon name="plus" className="w-3 h-3" />
                         </button>
                     </div>
                 </div>
             );
         };
 
-        // 4. Product Card
-        const ProductCard = ({ item, onZoom, onSizeGuide, onTryOn, onAddToInquiry }) => {
-            const [selectedSize, setSelectedSize] = useState(null);
-            const [visible, setVisible] = useState(true);
-
-            if (!visible) return null;
-
-            const handleAdd = () => {
-                if (!selectedSize) {
-                    alert("請先選擇尺寸");
-                    return;
-                }
-                onAddToInquiry(item, selectedSize);
-                alert("已加入清單");
-            };
-
-            const handleZoomClick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onZoom(item.src);
-            };
-
-            return (
-                <div className="product-card">
-                    <div className="relative aspect-[4/5] bg-white cursor-zoom-in group" onClick={handleZoomClick}>
-                        <img src={item.src} alt={item.name} className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105" onError={() => setVisible(false)} />
-                        <div className="absolute bottom-0 left-0 w-full p-3 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex justify-end">
-                            <span className="bg-white/90 backdrop-blur text-[9px] px-2 py-1 rounded shadow-sm font-bold uppercase tracking-wider">Zoom</span>
-                        </div>
-                    </div>
-                    <div className="p-6">
-                        <div className="flex justify-between items-start mb-1">
-                            <div>
-                                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide leading-tight">{item.name}</h3>
-                                <p className="text-xs text-gray-400 mt-1">{item.catLabel} {item.id}</p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center justify-between mb-6 mt-4">
-                            <div className="flex gap-2">
-                                {SIZES.map(s => (
-                                    <button key={s} onClick={() => setSelectedSize(s)} className={`size-btn ${selectedSize === s ? 'active' : ''}`}>{s}</button>
-                                ))}
-                            </div>
-                            <button onClick={() => onSizeGuide(item.catId)} className="text-[10px] text-gray-400 hover:text-black border-b border-transparent hover:border-black transition-all flex items-center gap-1 pb-0.5">
-                                <Icon name="ruler" className="w-3 h-3" /> 尺寸對照表
-                            </button>
-                        </div>
-
-                        <div className="flex gap-2">
-                            <button 
-                                className="flex-1 py-3.5 btn-try text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2"
-                                onClick={() => onTryOn(item)}
-                            >
-                                <Icon name="hanger" className="w-3 h-3" /> 試穿搭配
-                            </button>
-                            <button 
-                                className={`flex-[1.5] py-3.5 text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${selectedSize ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
-                                onClick={handleAdd}
-                            >
-                                <span>加入清單</span><Icon name="plus" className="w-3 h-3" />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        // --- MAIN APP ---
+        // --- MAIN APPLICATION ---
         const App = () => {
             const [activeTab, setActiveTab] = useState('new');
-            const [zoomItem, setZoomItem] = useState(null);
-            const [sizeGuideCategory, setSizeGuideCategory] = useState(null);
-            const [outfit, setOutfit] = useState({ short_t: null, long_t: null, sweatshirt: null, bottom: null, shoes: null });
+            const [catalogTab, setCatalogTab] = useState('all');
+            const [styleCategory, setStyleCategory] = useState('tops'); // tops, bottoms, shoes
             
-            // Cart State
+            const [detailItem, setDetailItem] = useState(null);
             const [inquiryList, setInquiryList] = useState([]);
             const [showCart, setShowCart] = useState(false);
 
-            // Catalog Generation
+            // Outfit State
+            const [outfit, setOutfit] = useState({ short_t: null, long_t: null, sweatshirt: null, bottom: null, shoes: null });
+
+            // Data Generation (v3.0 Dual Image Logic)
             const catalog = useMemo(() => {
                 let items = [];
                 CATEGORIES.forEach(cat => {
                     for(let i=1; i<=15; i++) {
-                        let src = '';
-                        let subType = '';
+                        // Display Image (Grid/Detail)
+                        let d_src = '';
+                        // Ghost Image (Style Overlay)
+                        let g_src = '';
                         
-                        // v2.3 Shoes Logic: s0x, w0x, x0x
-                        if(cat.id === 'shoes') {
-                           if(i <= 5) { src = `s0${i}.png`; subType = 'Formal'; }
-                           else if(i <= 10) { src = `w${i-5}.png`; subType = 'Casual'; }
-                           else { src = `x0${i-10}.png`; subType = 'Sneakers'; }
+                        let baseName = '';
+
+                        // Logic for Shoes/Bottoms vs Tops
+                        if (cat.id === 'shoes') {
+                            if (i <= 5) baseName = `s0${i}`;
+                            else if (i <= 10) baseName = `w${i-5}`;
+                            else baseName = `x0${i-10}`;
+                            d_src = `${baseName}.png`; // Shoes/Bottoms reuse same image mostly
+                            g_src = `${baseName}.png`;
+                        } else if (cat.id === 'bottom') {
+                            baseName = `b${i}`;
+                            d_src = `${baseName}.png`;
+                            g_src = `${baseName}.png`;
                         } else {
-                            src = `${cat.prefix}${i}.png`;
+                            // Tops have _d and _g
+                            baseName = `${cat.prefix}${i}`;
+                            d_src = `${baseName}_d.png`;
+                            g_src = `${baseName}_g.png`;
                         }
 
                         items.push({
-                            uid: `${cat.id}-${i}`, 
-                            id: `#${cat.prefix.toUpperCase()}${String(i).padStart(3, '0')}`,
-                            catId: cat.id, 
-                            catLabel: cat.label, 
-                            name: cat.name + (subType ? ` (${subType})` : ''), 
-                            src: `./${src}`,
-                            subType: subType 
+                            uid: `${cat.id}-${i}`,
+                            id: baseName.toUpperCase(),
+                            catId: cat.id,
+                            name: cat.name,
+                            srcDisplay: `./${d_src}`,
+                            srcGhost: `./${g_src}`,
+                            // Helper to know which slot this goes to in outfit
+                            slot: cat.id
                         });
                     }
                 });
                 return items;
             }, []);
 
-            const getRand = useCallback((catId) => {
-                const pool = catalog.filter(i => i.catId === catId);
-                return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
-            }, [catalog]);
+            // Helper: Filter Catalog
+            const filteredCatalog = useMemo(() => {
+                if (catalogTab === 'all') return catalog;
+                return catalog.filter(i => i.catId === catalogTab);
+            }, [catalog, catalogTab]);
 
-            const handleTryOn = (item) => {
-                setOutfit(prev => ({
-                    ...prev,
-                    short_t: item.catId === 'short_t' ? item : null,
-                    long_t: item.catId === 'long_t' ? item : null,
-                    sweatshirt: item.catId === 'sweatshirt' ? item : null,
-                    bottom: prev.bottom || getRand('bottom'),
-                    shoes: prev.shoes || getRand('shoes')
-                }));
-                setActiveTab('style');
-            };
+            // Helper: Filter Style Thumbnails
+            const styleThumbnails = useMemo(() => {
+                if (styleCategory === 'tops') return catalog.filter(i => ['short_t', 'long_t', 'sweatshirt'].includes(i.catId));
+                if (styleCategory === 'bottoms') return catalog.filter(i => i.catId === 'bottom');
+                if (styleCategory === 'shoes') return catalog.filter(i => i.catId === 'shoes');
+                return [];
+            }, [catalog, styleCategory]);
 
-            const handleSmartPick = () => {
-                const hasTop = outfit.short_t || outfit.long_t || outfit.sweatshirt;
-                setOutfit(prev => ({
-                    ...prev,
-                    short_t: hasTop ? prev.short_t : getRand('short_t'),
-                    long_t: hasTop ? prev.long_t : (Math.random() > 0.7 ? getRand('long_t') : null),
-                    sweatshirt: hasTop ? prev.sweatshirt : null,
-                    bottom: getRand('bottom'),
-                    shoes: getRand('shoes')
-                }));
-            };
-
+            // Actions
             const addToInquiry = (item, size) => {
                 setInquiryList(prev => [...prev, { ...item, size }]);
+                setDetailItem(null); // Close modal
             };
+
             const removeFromInquiry = (idx) => {
                 setInquiryList(prev => prev.filter((_, i) => i !== idx));
             };
 
+            const handleShuffle = () => {
+                // Randomize entire outfit
+                const getRandom = (catId) => {
+                    const pool = catalog.filter(i => i.catId === catId);
+                    return pool[Math.floor(Math.random() * pool.length)];
+                };
+                
+                // Randomize top type (33% chance each)
+                const topType = Math.random();
+                let newTop = {};
+                if (topType < 0.33) newTop = { short_t: getRandom('short_t'), long_t: null, sweatshirt: null };
+                else if (topType < 0.66) newTop = { short_t: null, long_t: getRandom('long_t'), sweatshirt: null };
+                else newTop = { short_t: null, long_t: null, sweatshirt: getRandom('sweatshirt') };
+
+                setOutfit({
+                    ...newTop,
+                    bottom: getRandom('bottom'),
+                    shoes: getRandom('shoes')
+                });
+            };
+
+            const handleManualStyle = (item) => {
+                setOutfit(prev => {
+                    // Logic to clear conflicting tops
+                    const newOutfit = { ...prev };
+                    if (['short_t', 'long_t', 'sweatshirt'].includes(item.slot)) {
+                        newOutfit.short_t = null;
+                        newOutfit.long_t = null;
+                        newOutfit.sweatshirt = null;
+                    }
+                    newOutfit[item.slot] = item;
+                    return newOutfit;
+                });
+            };
+
             return (
                 <div className="app-container">
-                    <div className="px-6 pt-10 pb-6 bg-[#F9F9F9] z-10 flex flex-col items-center">
-                        <h1 className="text-xl font-extrabold tracking-tighter text-center flex items-center gap-2">DbSSTUDIO</h1>
-                        <span className="text-[10px] text-gray-400 tracking-[0.2em] uppercase mt-1">v2.3 Ultimate Archive 2026</span>
-                    </div>
+                    
+                    {/* PAGE 1: NEW ARRIVALS (CATALOG) */}
+                    {activeTab === 'new' && (
+                        <>
+                            {/* Sticky Tabs */}
+                            <div className="sticky-tabs">
+                                <button onClick={()=>setCatalogTab('all')} className={`tab-btn ${catalogTab==='all'?'active':''}`}>全部 ALL</button>
+                                <button onClick={()=>setCatalogTab('short_t')} className={`tab-btn ${catalogTab==='short_t'?'active':''}`}>短T T-Shirt</button>
+                                <button onClick={()=>setCatalogTab('long_t')} className={`tab-btn ${catalogTab==='long_t'?'active':''}`}>長T Long</button>
+                                <button onClick={()=>setCatalogTab('sweatshirt')} className={`tab-btn ${catalogTab==='sweatshirt'?'active':''}`}>衛衣 Hoodie</button>
+                            </div>
 
-                    <div className="content-area px-5 pt-2">
-                        {activeTab === 'new' && (
-                            <div className="animate-fade-in">
-                                <div className="mb-8 text-center">
-                                    <h2 className="text-xs font-bold text-gray-900 uppercase tracking-[0.2em] mb-1">Season 2026</h2>
-                                    <p className="text-[10px] text-gray-400 font-light tracking-wide">Tops Collection</p>
-                                </div>
-                                <div>
-                                    {catalog.filter(i => ['short_t', 'long_t', 'sweatshirt'].includes(i.catId)).map(item => (
-                                        <ProductCard 
-                                            key={item.uid} item={item} 
-                                            onZoom={setZoomItem} onSizeGuide={setSizeGuideCategory} 
-                                            onTryOn={handleTryOn} onAddToInquiry={addToInquiry}
-                                        />
+                            {/* 3-Col Grid */}
+                            <div className="content-area">
+                                <div className="catalog-grid">
+                                    {filteredCatalog.map(item => (
+                                        <div key={item.uid} className="grid-item" onClick={() => setDetailItem(item)}>
+                                            <img src={item.srcDisplay} alt={item.id} onError={(e)=>e.target.style.display='none'} />
+                                            <div className="absolute bottom-1 right-1 text-[8px] text-gray-400">{item.id}</div>
+                                        </div>
                                     ))}
                                 </div>
-                                <div className="text-center py-12 text-[10px] text-gray-300 uppercase tracking-widest border-t border-gray-100 mt-4">- End of Collection -</div>
+                                <div className="py-8 text-center text-[10px] text-gray-300 tracking-widest">END OF CATALOG</div>
                             </div>
-                        )}
+                        </>
+                    )}
 
-                        {activeTab === 'style' && (
-                            <div className="animate-fade-in flex flex-col h-full">
-                                <div className="ghost-canvas-container bg-white shadow-sm border border-gray-100 mb-4">
-                                    {outfit.shoes && <img src={outfit.shoes.src} className="ghost-layer z-10" onError={(e)=>e.target.style.display='none'} />}
-                                    {outfit.bottom && <img src={outfit.bottom.src} className="ghost-layer z-20" onError={(e)=>e.target.style.display='none'} />}
-                                    {outfit.short_t && <img src={outfit.short_t.src} className="ghost-layer z-30" onError={(e)=>e.target.style.display='none'} />}
-                                    {outfit.long_t && <img src={outfit.long_t.src} className="ghost-layer z-[35]" onError={(e)=>e.target.style.display='none'} />}
-                                    {outfit.sweatshirt && <img src={outfit.sweatshirt.src} className="ghost-layer z-40" onError={(e)=>e.target.style.display='none'} />}
-                                    {(!outfit.bottom && !outfit.shoes && !outfit.short_t) && (
+                    {/* PAGE 2: STYLE EDITOR */}
+                    {activeTab === 'style' && (
+                        <div className="style-layout">
+                            {/* Top: Ghost Preview */}
+                            <div className="style-preview">
+                                <div className="ghost-canvas-container h-full w-full bg-white">
+                                    {/* Layers Z-Index: Shoes(10), Bottom(20), Tops(30) */}
+                                    {outfit.shoes && <img src={outfit.shoes.srcGhost} className="ghost-layer z-10" />}
+                                    {outfit.bottom && <img src={outfit.bottom.srcGhost} className="ghost-layer z-20" />}
+                                    {outfit.short_t && <img src={outfit.short_t.srcGhost} className="ghost-layer z-30" />}
+                                    {outfit.long_t && <img src={outfit.long_t.srcGhost} className="ghost-layer z-30" />}
+                                    {outfit.sweatshirt && <img src={outfit.sweatshirt.srcGhost} className="ghost-layer z-30" />}
+                                    
+                                    {(!outfit.bottom && !outfit.shoes && !outfit.short_t && !outfit.long_t && !outfit.sweatshirt) && (
                                         <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-300">
-                                            <Icon name="eye" className="w-8 h-8 opacity-20 mb-2" />
-                                            <span className="text-xs tracking-widest uppercase">Waiting for Input</span>
+                                            <span className="text-xs tracking-widest uppercase">Start Styling</span>
                                         </div>
                                     )}
                                 </div>
-                                <div className="px-1">
-                                    <button onClick={handleSmartPick} className="w-full py-4 bg-black text-white text-xs font-bold uppercase tracking-[0.2em] hover:bg-gray-800 transition-all flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform active:scale-98">
-                                        <Icon name="dice" className="w-4 h-4" /> 
-                                        { (outfit.short_t || outfit.long_t || outfit.sweatshirt) ? "鎖定上身．切換搭配" : "DBS 智慧選 (Shuffle)" }
-                                    </button>
-                                </div>
                             </div>
-                        )}
 
-                        {activeTab === 'contact' && (
-                            <div className="animate-fade-in bg-white border border-gray-100 p-8 mt-2 min-h-[60vh] flex flex-col">
-                                <div className="text-center mb-10">
-                                    <h2 className="text-lg font-bold mb-2">DbSSTUDIO</h2>
-                                    <div className="w-6 h-0.5 bg-black mx-auto mb-4"></div>
-                                    <p className="text-xs text-gray-500 tracking-widest">EST. 2026</p>
+                            {/* Middle: Controls */}
+                            <div className="style-controls">
+                                <div className="cat-switch">
+                                    <button onClick={()=>setStyleCategory('tops')} className={`cat-btn ${styleCategory==='tops'?'active':''}`}>TOPS</button>
+                                    <button onClick={()=>setStyleCategory('bottoms')} className={`cat-btn ${styleCategory==='bottoms'?'active':''}`}>BOTTOMS</button>
+                                    <button onClick={()=>setStyleCategory('shoes')} className={`cat-btn ${styleCategory==='shoes'?'active':''}`}>SHOES</button>
                                 </div>
-                                <div className="mb-10">
-                                    <h3 className="text-xs font-bold uppercase tracking-wider mb-3 text-gray-900">品牌精神 (Philosophy)</h3>
-                                    <p className="text-[11px] leading-6 text-gray-500 text-justify">致力於極簡美學與實用主義的完美平衡。我們相信服裝不僅是遮蔽，更是自我風格的無聲語言。<br/><br/>Minimalism meets utility.</p>
-                                </div>
-                                <div className="mt-auto">
-                                    <button onClick={() => window.location.href=`https://line.me/R/oaMessage/${LINE_ID}/?Hi`} className="btn-line w-full py-3.5 rounded flex items-center justify-center gap-2 text-xs font-bold tracking-wide shadow-sm"><Icon name="chat" className="w-4 h-4" /> Line 線上諮詢</button>
-                                </div>
+                                <button onClick={handleShuffle} className="p-2 rounded-full hover:bg-gray-100">
+                                    <Icon name="dice" className="w-5 h-5 text-black" />
+                                </button>
                             </div>
-                        )}
-                    </div>
 
+                            {/* Bottom: Thumbnails */}
+                            <div className="style-thumbnails">
+                                {styleThumbnails.map(item => (
+                                    <div key={item.uid} className="thumb-item" onClick={() => handleManualStyle(item)}>
+                                        <img src={item.srcDisplay} alt={item.id} />
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            {/* Spacer for Bottom Nav */}
+                            <div className="h-[70px] bg-white"></div>
+                        </div>
+                    )}
+
+                    {/* PAGE 3: CONTACT */}
+                    {activeTab === 'contact' && (
+                        <div className="content-area p-8 flex flex-col justify-center text-center min-h-full">
+                            <h2 className="text-xl font-bold mb-2">DbSSTUDIO</h2>
+                            <p className="text-xs text-gray-400 tracking-widest mb-8">ARCHIVE 2026</p>
+                            <p className="text-xs leading-6 text-gray-600 mb-8">
+                                極簡主義與實用美學的交匯點。<br/>
+                                每一件單品皆為獨立靈魂設計。
+                            </p>
+                            <button onClick={() => window.location.href=`https://line.me/R/oaMessage/${LINE_ID}/?Hi`} className="w-full bg-[#06C755] text-white py-3 rounded text-xs font-bold flex items-center justify-center gap-2">
+                                <Icon name="chat" className="w-4 h-4" /> Line 線上諮詢
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Global Elements */}
                     {inquiryList.length > 0 && (
-                        <div className="floating-cart animate-fade-in" onClick={() => setShowCart(true)}>
+                        <div className="floating-cart" onClick={() => setShowCart(true)}>
                             <Icon name="cart" className="w-5 h-5" />
                             <div className="cart-badge">{inquiryList.length}</div>
                         </div>
                     )}
 
+                    {/* Bottom Nav */}
                     <div className="bottom-nav">
-                        <div onClick={() => setActiveTab('new')} className={`nav-item ${activeTab === 'new' ? 'active' : ''}`}><Icon name="home" className="w-5 h-5" /><span>本季新品</span></div>
-                        <div onClick={() => setActiveTab('style')} className={`nav-item ${activeTab === 'style' ? 'active' : ''}`}><Icon name="hanger" className="w-5 h-5" /><span>風格搭配</span></div>
-                        <div onClick={() => setActiveTab('contact')} className={`nav-item ${activeTab === 'contact' ? 'active' : ''}`}><Icon name="chat" className="w-5 h-5" /><span>品牌名片</span></div>
+                        <div onClick={() => setActiveTab('new')} className={`nav-item ${activeTab === 'new' ? 'active' : ''}`}><Icon name="home" className="w-5 h-5" /><span>目錄</span></div>
+                        <div onClick={() => setActiveTab('style')} className={`nav-item ${activeTab === 'style' ? 'active' : ''}`}><Icon name="hanger" className="w-5 h-5" /><span>搭配</span></div>
+                        <div onClick={() => setActiveTab('contact')} className={`nav-item ${activeTab === 'contact' ? 'active' : ''}`}><Icon name="chat" className="w-5 h-5" /><span>關於</span></div>
                     </div>
 
-                    {zoomItem && <Lightbox src={zoomItem} onClose={() => setZoomItem(null)} />}
-                    {sizeGuideCategory && <SizeGuideModal category={sizeGuideCategory} onClose={() => setSizeGuideCategory(null)} />}
+                    {/* Modals */}
+                    {detailItem && <DetailModal item={detailItem} onClose={() => setDetailItem(null)} onAdd={addToInquiry} />}
                     {showCart && <InquiryCartModal list={inquiryList} onRemove={removeFromInquiry} onClose={() => setShowCart(false)} />}
+
                 </div>
             );
         };
+
         ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
