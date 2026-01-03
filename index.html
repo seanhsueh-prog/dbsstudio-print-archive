@@ -1,14 +1,14 @@
-<!-- DbSSTUDIO-Showroom.v3.4.html -->
+<!-- DbSSTUDIO-Showroom.v3.5.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DbSSTUDIO v3.4 - Ultimate Archive 2026</title>
+    <title>DbSSTUDIO v3.5 - Commercial Stable 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [DbSSTUDIO v3.4 - Stability & Commerce Logic] */
+        /* [DbSSTUDIO v3.5 - Commercial Stable] */
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             -webkit-font-smoothing: antialiased; 
@@ -42,13 +42,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in { animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        
-        @keyframes click-pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(0.9); }
-            100% { transform: scale(1); }
-        }
-        .animate-click { animation: click-pulse 0.2s ease-in-out; }
 
         /* Header */
         .brand-header {
@@ -63,7 +56,7 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 1px;
             background-color: #f0f0f0;
-            padding-bottom: 40px; /* Ensure bottom visibility */
+            padding-bottom: 40px;
         }
         .grid-item {
             background-color: #fff;
@@ -118,13 +111,11 @@
             display: flex; flex-direction: column; gap: 8px;
             background: #fff; z-index: 30;
         }
-        .cat-switch { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .cat-group { display: flex; gap: 4px; }
-        
+        .cat-switch { display: flex; gap: 4px; overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; }
         .cat-btn {
             padding: 6px 12px; border-radius: 99px;
             font-size: 10px; font-weight: 600;
-            background: #f5f5f5; color: #888;
+            background: #f5f5f5; color: #888; white-space: nowrap;
             transition: all 0.2s; cursor: pointer;
         }
         .cat-btn.active { background: #000; color: #fff; }
@@ -229,21 +220,21 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
-        // --- 1. DATA CONFIG (v3.4 Precise Counts) ---
+        // --- 1. DATA CONFIG (v3.5 Finalized) ---
         const COUNTS = {
             short_t: 15,
             long_t: 15,
             sweatshirt: 10,
             bottom: 16,
-            shoes: 10
+            shoes: 15 // Total shoes (5+5+5)
         };
 
         const CATEGORIES = [
-            { id: 'short_t', label: '短 T-Shirt', prefix: 'st', name: 'Cotton Tee', count: COUNTS.short_t },
-            { id: 'long_t', label: '長 T-Shirt', prefix: 'lt', name: 'Layering Long', count: COUNTS.long_t },
-            { id: 'sweatshirt', label: '衛衣 Hoodie', prefix: 'sw', name: 'Heavyweight', count: COUNTS.sweatshirt },
-            { id: 'bottom', label: '下身 Bottoms', prefix: 'b', name: 'Trousers', count: COUNTS.bottom },
-            { id: 'shoes', label: '鞋履 Shoes', prefix: 's', name: 'Footwear', count: COUNTS.shoes }
+            { id: 'short_t', label: '短T', prefix: 'st', name: 'Cotton Tee', count: COUNTS.short_t },
+            { id: 'long_t', label: '長T', prefix: 'lt', name: 'Layering Long', count: COUNTS.long_t },
+            { id: 'sweatshirt', label: '衛衣', prefix: 'sw', name: 'Heavyweight', count: COUNTS.sweatshirt },
+            { id: 'bottom', label: '褲裝', prefix: 'b', name: 'Trousers', count: COUNTS.bottom },
+            { id: 'shoes', label: '鞋履', prefix: 's', name: 'Footwear', count: COUNTS.shoes }
         ];
         
         const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -254,12 +245,13 @@
             const icons = {
                 x: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
                 plus: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
-                dice: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/></svg>,
                 chat: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
                 home: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
                 hanger: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2a5 5 0 0 1 4.9 6H7.1a5 5 0 0 1 4.9-6Z"/><path d="M21 21H3V11c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v10Z"/></svg>,
                 cart: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>,
-                trash: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                trash: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>,
+                ruler: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2 12h20"/><path d="M4 12v3"/><path d="M8 12v3"/><path d="M12 12v3"/><path d="M16 12v3"/><path d="M20 12v3"/></svg>,
+                eye: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             };
             return icons[name] ? React.cloneElement(icons[name], { className }) : null;
         };
@@ -299,13 +291,20 @@
 
         const DetailModal = ({ item, onClose, onAdd }) => {
             const [size, setSize] = useState(null);
+            
+            const handleImgError = (e) => {
+                if (e.target.src !== new URL(item.srcOriginal, window.location.href).href) {
+                    e.target.src = item.srcOriginal;
+                }
+            };
+
             return (
                 <div className="detail-modal">
                     <div className="absolute top-0 w-full p-4 flex justify-end z-20">
                         <button onClick={onClose} className="bg-white rounded-full p-2 shadow-md"><Icon name="x" className="w-6 h-6" /></button>
                     </div>
                     <div className="detail-image-area">
-                        <img src={item.srcDisplay} className="detail-img" alt={item.id} onError={(e)=>{ if(e.target.src !== item.srcOriginal) e.target.src = item.srcOriginal; }} />
+                        <img src={item.srcDisplay} className="detail-img" alt={item.id} onError={handleImgError} />
                     </div>
                     <div className="detail-controls">
                         <div className="flex justify-between items-center mb-4">
@@ -324,43 +323,46 @@
             );
         };
 
+        const SizeGuideModal = ({ onClose }) => (
+            <div className="fixed inset-0 z-[90] bg-black/60 flex items-center justify-center p-6 animate-fade-in" onClick={onClose}>
+                <div className="bg-white w-full max-w-xs rounded p-6 relative" onClick={e=>e.stopPropagation()}>
+                    <button onClick={onClose} className="absolute top-4 right-4"><Icon name="x" className="w-5 h-5"/></button>
+                    <h3 className="font-bold text-sm mb-4">尺寸指南</h3>
+                    <p className="text-xs text-gray-500">請參考商品頁面之詳細數據。</p>
+                </div>
+            </div>
+        );
+
         // --- MAIN APP ---
         const App = () => {
             const [activeTab, setActiveTab] = useState('new');
             const [catalogTab, setCatalogTab] = useState('all');
             
-            // Style Page States
             const [styleCategory, setStyleCategory] = useState('tops'); 
             const [styleSubFilter, setStyleSubFilter] = useState('all'); 
             
-            // Dice Animation State
-            const [isShuffling, setIsShuffling] = useState(false);
-
             const [detailItem, setDetailItem] = useState(null);
             const [inquiryList, setInquiryList] = useState([]);
             const [showCart, setShowCart] = useState(false);
+            const [showSizeGuide, setShowSizeGuide] = useState(false);
 
             const [outfit, setOutfit] = useState({ short_t: null, long_t: null, sweatshirt: null, bottom: null, shoes: null });
             
-            // Ref for carousel
             const carouselRef = useRef(null);
 
-            // Catalog Generation (v3.4 Inventory Limit)
+            // Catalog Generation (v3.5 Full Logic)
             const catalog = useMemo(() => {
                 let items = [];
                 CATEGORIES.forEach(cat => {
-                    for(let i=1; i<=cat.count; i++) { // Using defined counts
+                    for(let i=1; i<=cat.count; i++) {
                         let baseName = '';
-                        const idSuffix = String(i).padStart(3, '0');
-
+                        // Special Handling for Shoes
                         if (cat.id === 'shoes') {
-                            if (i <= 5) baseName = `s${idSuffix}`;
+                            if (i <= 5) baseName = `s${String(i).padStart(3, '0')}`;
                             else if (i <= 10) baseName = `w${String(i-5).padStart(3, '0')}`;
                             else baseName = `x${String(i-10).padStart(3, '0')}`;
-                        } else if (cat.id === 'bottom') {
-                            baseName = `b${idSuffix}`;
                         } else {
-                            baseName = `${cat.prefix}${idSuffix}`;
+                            baseName = `${cat.prefix}${String(i).padStart(3, '0')}`;
                         }
 
                         const d_src = `${baseName}_d.png`;
@@ -405,7 +407,7 @@
                 return pool;
             }, [catalog, styleCategory, styleSubFilter]);
 
-            // Reset carousel on filter change
+            // Reset carousel
             useEffect(() => {
                 if (carouselRef.current) carouselRef.current.scrollLeft = 0;
             }, [styleCategory, styleSubFilter]);
@@ -417,29 +419,6 @@
 
             const removeFromInquiry = (idx) => {
                 setInquiryList(prev => prev.filter((_, i) => i !== idx));
-            };
-
-            const handleShuffle = () => {
-                setIsShuffling(true);
-                setTimeout(() => setIsShuffling(false), 200);
-
-                const getRandom = (catId) => {
-                    const pool = catalog.filter(i => i.catId === catId);
-                    return pool[Math.floor(Math.random() * pool.length)];
-                };
-                
-                // Three-in-One Logic: Force update Top + Bottom + Shoes
-                const topType = Math.random();
-                let newTop = {};
-                if (topType < 0.33) newTop = { short_t: getRandom('short_t'), long_t: null, sweatshirt: null };
-                else if (topType < 0.66) newTop = { short_t: null, long_t: getRandom('long_t'), sweatshirt: null };
-                else newTop = { short_t: null, long_t: null, sweatshirt: getRandom('sweatshirt') };
-
-                setOutfit({
-                    ...newTop,
-                    bottom: getRandom('bottom'),
-                    shoes: getRandom('shoes')
-                });
             };
 
             const handleManualStyle = (item) => {
@@ -457,12 +436,12 @@
                 if (e.target.src !== new URL(item.srcOriginal, window.location.href).href) {
                     e.target.src = item.srcOriginal;
                 } else {
-                    e.target.style.display = 'none'; 
+                    e.target.parentElement.style.display = 'none'; // Hide grid item
                 }
             };
 
             const handleThumbError = (e) => {
-                e.target.parentElement.style.display = 'none';
+                e.target.parentElement.style.display = 'none'; // Hide thumb item
             };
 
             return (
@@ -474,7 +453,7 @@
                             <div className="brand-header">
                                 <h1 className="text-xl font-bold tracking-tighter text-center">
                                     DbSSTUDIO
-                                    <span className="ml-2 font-light text-xs text-gray-400 tracking-widest block mt-1">v3.4 ARCHIVE</span>
+                                    <span className="ml-2 font-light text-xs text-gray-400 tracking-widest block mt-1">v3.5 ARCHIVE</span>
                                 </h1>
                             </div>
 
@@ -483,7 +462,7 @@
                                 <button onClick={()=>setCatalogTab('short_t')} className={`tab-btn ${catalogTab==='short_t'?'active':''}`}>短T</button>
                                 <button onClick={()=>setCatalogTab('long_t')} className={`tab-btn ${catalogTab==='long_t'?'active':''}`}>長T</button>
                                 <button onClick={()=>setCatalogTab('sweatshirt')} className={`tab-btn ${catalogTab==='sweatshirt'?'active':''}`}>衛衣</button>
-                                <button onClick={()=>setCatalogTab('bottom')} className={`tab-btn ${catalogTab==='bottom'?'active':''}`}>下身</button>
+                                <button onClick={()=>setCatalogTab('bottom')} className={`tab-btn ${catalogTab==='bottom'?'active':''}`}>褲裝</button>
                                 <button onClick={()=>setCatalogTab('shoes')} className={`tab-btn ${catalogTab==='shoes'?'active':''}`}>鞋履</button>
                             </div>
 
@@ -510,15 +489,17 @@
                         <div className="style-layout">
                             <div className="style-preview">
                                 <div className="ghost-canvas-container h-full w-full bg-white">
-                                    {outfit.shoes && <img src={outfit.shoes.srcGhost} className="ghost-layer z-10" onError={(e)=>handleGridImgError(e, outfit.shoes)} />}
-                                    {outfit.bottom && <img src={outfit.bottom.srcGhost} className="ghost-layer z-20" onError={(e)=>handleGridImgError(e, outfit.bottom)} />}
-                                    {outfit.short_t && <img src={outfit.short_t.srcGhost} className="ghost-layer z-30" onError={(e)=>handleGridImgError(e, outfit.short_t)} />}
-                                    {outfit.long_t && <img src={outfit.long_t.srcGhost} className="ghost-layer z-30" onError={(e)=>handleGridImgError(e, outfit.long_t)} />}
-                                    {outfit.sweatshirt && <img src={outfit.sweatshirt.srcGhost} className="ghost-layer z-30" onError={(e)=>handleGridImgError(e, outfit.sweatshirt)} />}
+                                    {/* Z-Index: Shoes(10), Bottom(20), Tops(30) */}
+                                    {outfit.shoes && <img src={outfit.shoes.srcGhost} className="ghost-layer z-10" onError={(e)=>e.target.style.display='none'} />}
+                                    {outfit.bottom && <img src={outfit.bottom.srcGhost} className="ghost-layer z-20" onError={(e)=>e.target.style.display='none'} />}
+                                    {outfit.short_t && <img src={outfit.short_t.srcGhost} className="ghost-layer z-30" onError={(e)=>e.target.style.display='none'} />}
+                                    {outfit.long_t && <img src={outfit.long_t.srcGhost} className="ghost-layer z-30" onError={(e)=>e.target.style.display='none'} />}
+                                    {outfit.sweatshirt && <img src={outfit.sweatshirt.srcGhost} className="ghost-layer z-30" onError={(e)=>e.target.style.display='none'} />}
                                     
                                     {(!outfit.bottom && !outfit.shoes && !outfit.short_t && !outfit.long_t && !outfit.sweatshirt) && (
                                         <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-300">
-                                            <span className="text-xs tracking-widest uppercase">Start Styling</span>
+                                            <Icon name="eye" className="w-8 h-8 opacity-20 mb-2" />
+                                            <span className="text-xs tracking-widest uppercase mt-2">請選擇下方單品進行搭配</span>
                                         </div>
                                     )}
                                 </div>
@@ -526,14 +507,9 @@
 
                             <div className="style-controls">
                                 <div className="cat-switch">
-                                    <div className="cat-group">
-                                        <button onClick={()=>{setStyleCategory('tops'); setStyleSubFilter('all');}} className={`cat-btn ${styleCategory==='tops'?'active':''}`}>TOPS</button>
-                                        <button onClick={()=>setStyleCategory('bottoms')} className={`cat-btn ${styleCategory==='bottoms'?'active':''}`}>BOTTOMS</button>
-                                        <button onClick={()=>setStyleCategory('shoes')} className={`cat-btn ${styleCategory==='shoes'?'active':''}`}>SHOES</button>
-                                    </div>
-                                    <button onClick={handleShuffle} className={`p-3 rounded-full hover:bg-gray-100 z-50 ${isShuffling ? 'animate-click' : ''}`}>
-                                        <Icon name="dice" className="w-5 h-5 text-black" />
-                                    </button>
+                                    <button onClick={()=>{setStyleCategory('tops'); setStyleSubFilter('all');}} className={`cat-btn ${styleCategory==='tops'?'active':''}`}>上衣</button>
+                                    <button onClick={()=>setStyleCategory('bottoms')} className={`cat-btn ${styleCategory==='bottoms'?'active':''}`}>褲裝</button>
+                                    <button onClick={()=>setStyleCategory('shoes')} className={`cat-btn ${styleCategory==='shoes'?'active':''}`}>鞋履</button>
                                 </div>
                                 {/* Sub-filters for Tops */}
                                 {styleCategory === 'tops' && (
@@ -588,6 +564,7 @@
 
                     {detailItem && <DetailModal item={detailItem} onClose={() => setDetailItem(null)} onAdd={addToInquiry} />}
                     {showCart && <InquiryCartModal list={inquiryList} onRemove={removeFromInquiry} onClose={() => setShowCart(false)} />}
+                    {showSizeGuide && <SizeGuideModal onClose={() => setShowSizeGuide(false)} />}
 
                 </div>
             );
