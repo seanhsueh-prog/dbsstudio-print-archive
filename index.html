@@ -49,8 +49,18 @@
         /* Header */
         .brand-header {
             padding: 20px 0 10px 0;
-            background: #fff; display: flex; justify-content: center;
+            background: #fff; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             border-bottom: 1px solid #f9f9f9;
+        }
+        .brand-logo {
+            width: 180px; height: auto; object-fit: contain;
+        }
+        .version-tag {
+            font-size: 10px; color: #999; margin-top: 4px; letter-spacing: 1px;
         }
 
         /* 3-Column Grid */
@@ -229,10 +239,10 @@
 
         // --- 1. DATA CONFIG (v3.6 Unlocked) ---
         const COUNTS = {
-            short_t: 15,
-            long_t: 15,
-            sweatshirt: 10,
-            bottom: 16, // Fixed: B001-B016
+            short_t: 20,
+            long_t: 20,
+            sweatshirt: 15,
+            bottom: 30, // Limit unlocked to 30 for B001-B030
             shoes: 15   // Fixed: s(5)+w(5)+x(5)
         };
 
@@ -300,7 +310,8 @@
             const [size, setSize] = useState(null);
             
             const handleImgError = (e) => {
-                if (e.target.src !== new URL(item.srcOriginal, window.location.href).href) {
+                // Smart Fallback: try different formats
+                if (e.target.src.includes('_d.png')) {
                     e.target.src = item.srcOriginal;
                 }
             };
@@ -363,13 +374,18 @@
                 CATEGORIES.forEach(cat => {
                     for(let i=1; i<=cat.count; i++) {
                         let baseName = '';
-                        // Special Handling for Shoes
+                        // 3-Digit Padding
+                        const idSuffix = String(i).padStart(3, '0');
+
+                        // Logic for Shoes/Bottoms vs Tops
                         if (cat.id === 'shoes') {
                             if (i <= 5) baseName = `s${String(i).padStart(3, '0')}`;
                             else if (i <= 10) baseName = `w${String(i-5).padStart(3, '0')}`;
                             else baseName = `x${String(i-10).padStart(3, '0')}`;
+                        } else if (cat.id === 'bottom') {
+                            baseName = `b${idSuffix}`;
                         } else {
-                            baseName = `${cat.prefix}${String(i).padStart(3, '0')}`;
+                            baseName = `${cat.prefix}${idSuffix}`;
                         }
 
                         const d_src = `${baseName}_d.png`;
@@ -440,10 +456,11 @@
             };
 
             const handleGridImgError = (e, item) => {
-                if (e.target.src !== new URL(item.srcOriginal, window.location.href).href) {
+                // Try fallback to original if _d fails
+                if (e.target.src.includes('_d.png')) {
                     e.target.src = item.srcOriginal;
                 } else {
-                    e.target.parentElement.style.display = 'none'; // Hide grid item
+                    e.target.parentElement.style.display = 'none'; // Hide grid item if both fail
                 }
             };
 
@@ -458,7 +475,8 @@
                     {activeTab === 'new' && (
                         <>
                             <div className="brand-header">
-                                <img src="./brand_logo.png" alt="DbSSTUDIO" className="w-[180px] h-auto object-contain mx-auto" />
+                                <img src="./brand_logo.png" alt="DbSSTUDIO" className="brand-logo" />
+                                <span className="version-tag">v3.6 Ultimate Archive</span>
                             </div>
 
                             <div className="sticky-tabs">
@@ -494,11 +512,11 @@
                             <div className="style-preview">
                                 <div className="ghost-canvas-container h-full w-full bg-white">
                                     {/* Z-Index: Shoes(10), Bottom(20), Tops(30) */}
-                                    {outfit.shoes && <img src={outfit.shoes.srcGhost} className="ghost-layer z-10" onError={(e)=>handleGridImgError(e, outfit.shoes)} />}
-                                    {outfit.bottom && <img src={outfit.bottom.srcGhost} className="ghost-layer z-20" onError={(e)=>handleGridImgError(e, outfit.bottom)} />}
-                                    {outfit.short_t && <img src={outfit.short_t.srcGhost} className="ghost-layer z-30" onError={(e)=>handleGridImgError(e, outfit.short_t)} />}
-                                    {outfit.long_t && <img src={outfit.long_t.srcGhost} className="ghost-layer z-30" onError={(e)=>handleGridImgError(e, outfit.long_t)} />}
-                                    {outfit.sweatshirt && <img src={outfit.sweatshirt.srcGhost} className="ghost-layer z-30" onError={(e)=>handleGridImgError(e, outfit.sweatshirt)} />}
+                                    {outfit.shoes && <img src={outfit.shoes.srcGhost} className="ghost-layer z-10" onError={(e)=>e.target.style.display='none'} />}
+                                    {outfit.bottom && <img src={outfit.bottom.srcGhost} className="ghost-layer z-20" onError={(e)=>e.target.style.display='none'} />}
+                                    {outfit.short_t && <img src={outfit.short_t.srcGhost} className="ghost-layer z-30" onError={(e)=>e.target.style.display='none'} />}
+                                    {outfit.long_t && <img src={outfit.long_t.srcGhost} className="ghost-layer z-30" onError={(e)=>e.target.style.display='none'} />}
+                                    {outfit.sweatshirt && <img src={outfit.sweatshirt.srcGhost} className="ghost-layer z-30" onError={(e)=>e.target.style.display='none'} />}
                                     
                                     {(!outfit.bottom && !outfit.shoes && !outfit.short_t && !outfit.long_t && !outfit.sweatshirt) && (
                                         <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-300">
