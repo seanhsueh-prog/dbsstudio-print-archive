@@ -1,21 +1,21 @@
-<!-- DbSSTUDIO-Showroom.v3.5.html -->
+<!-- DbSSTUDIO-Showroom.v3.6.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DbSSTUDIO v3.5 - Commercial Stable 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>DbSSTUDIO v3.6 - Stable Archive 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [DbSSTUDIO v3.5 - Commercial Stable] */
+        /* [DbSSTUDIO v3.6 - Visual Identity & Stability] */
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             -webkit-font-smoothing: antialiased; 
             background-color: #F9F9F9; 
             color: #111; 
             margin: 0;
-            height: 100dvh;
+            height: 100dvh; /* Dynamic Height */
             overflow: hidden; 
             display: flex;
             justify-content: center; 
@@ -27,6 +27,9 @@
             background-color: #fff; position: relative;
             box-shadow: 0 0 40px rgba(0,0,0,0.05);
             display: flex; flex-direction: column; overflow: hidden;
+            /* Safe Area for iOS */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .content-area {
@@ -45,8 +48,8 @@
 
         /* Header */
         .brand-header {
-            padding: 24px 0 12px 0;
-            background: #fff; text-align: center;
+            padding: 20px 0 10px 0;
+            background: #fff; display: flex; justify-content: center;
             border-bottom: 1px solid #f9f9f9;
         }
 
@@ -106,15 +109,15 @@
         }
 
         .style-controls {
-            padding: 8px 12px;
+            padding: 10px 12px;
             border-top: 1px solid #f0f0f0;
-            display: flex; flex-direction: column; gap: 8px;
+            display: flex; flex-direction: column; gap: 10px;
             background: #fff; z-index: 30;
         }
-        .cat-switch { display: flex; gap: 4px; overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; }
+        .cat-switch { display: flex; gap: 6px; overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; }
         .cat-btn {
-            padding: 6px 12px; border-radius: 99px;
-            font-size: 10px; font-weight: 600;
+            padding: 8px 16px; border-radius: 99px;
+            font-size: 11px; font-weight: 600;
             background: #f5f5f5; color: #888; white-space: nowrap;
             transition: all 0.2s; cursor: pointer;
         }
@@ -125,21 +128,21 @@
             overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
         }
         .sub-btn {
-            font-size: 9px; padding: 4px 10px; border: 1px solid #eee; border-radius: 99px;
+            font-size: 10px; padding: 4px 10px; border: 1px solid #eee; border-radius: 99px;
             color: #999; transition: all 0.2s; white-space: nowrap; cursor: pointer;
         }
         .sub-btn.active { border-color: #000; color: #000; background: #fff; font-weight: 600; }
 
         /* Style Thumbnails */
         .style-thumbnails {
-            height: 100px; background: #fff;
+            height: 110px; background: #fff;
             display: flex; gap: 8px; padding: 8px 12px;
             overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
             border-top: 1px solid #f0f0f0;
         }
         .style-thumbnails::-webkit-scrollbar { display: none; }
         .thumb-item {
-            min-width: 70px; height: 100%;
+            min-width: 76px; height: 100%;
             border: 1px solid #eee; border-radius: 4px;
             display: flex; align-items: center; justify-content: center;
             padding: 4px; cursor: pointer; transition: border-color 0.2s;
@@ -155,6 +158,8 @@
             background: rgba(255,255,255,0.99); z-index: 99999;
             display: flex; flex-direction: column;
             animation: fade-in 0.25s ease-out;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
         .detail-image-area {
             flex: 1; overflow: auto; position: relative;
@@ -185,9 +190,10 @@
             backdrop-filter: blur(12px); border-top: 1px solid #f0f0f0;
             display: flex; justify-content: space-around;
             padding: 12px 0 28px 0; z-index: 100;
+            padding-bottom: calc(28px + env(safe-area-inset-bottom));
         }
         .nav-item {
-            font-size: 9px; font-weight: 600; color: #ccc;
+            font-size: 10px; font-weight: 600; color: #ccc;
             text-transform: uppercase; letter-spacing: 1px;
             cursor: pointer; text-align: center;
             transition: color 0.3s; display: flex; flex-direction: column;
@@ -197,11 +203,12 @@
 
         /* Floating Cart */
         .floating-cart {
-            position: absolute; bottom: 100px; right: 20px;
+            position: absolute; bottom: 110px; right: 20px;
             width: 48px; height: 48px; background: #000; color: #fff;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 90;
             cursor: pointer;
+            margin-bottom: env(safe-area-inset-bottom);
         }
         .cart-badge {
             position: absolute; top: 0; right: 0;
@@ -220,13 +227,13 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
-        // --- 1. DATA CONFIG (v3.5 Finalized) ---
+        // --- 1. DATA CONFIG (v3.6 Unlocked) ---
         const COUNTS = {
             short_t: 15,
             long_t: 15,
             sweatshirt: 10,
-            bottom: 16,
-            shoes: 15 // Total shoes (5+5+5)
+            bottom: 16, // Fixed: B001-B016
+            shoes: 15   // Fixed: s(5)+w(5)+x(5)
         };
 
         const CATEGORIES = [
@@ -300,7 +307,7 @@
 
             return (
                 <div className="detail-modal">
-                    <div className="absolute top-0 w-full p-4 flex justify-end z-20">
+                    <div className="absolute top-0 w-full p-4 flex justify-end z-20 mt-8">
                         <button onClick={onClose} className="bg-white rounded-full p-2 shadow-md"><Icon name="x" className="w-6 h-6" /></button>
                     </div>
                     <div className="detail-image-area">
@@ -350,7 +357,7 @@
             
             const carouselRef = useRef(null);
 
-            // Catalog Generation (v3.5 Full Logic)
+            // Catalog Generation (v3.6 Data Unlocked)
             const catalog = useMemo(() => {
                 let items = [];
                 CATEGORIES.forEach(cat => {
@@ -451,10 +458,7 @@
                     {activeTab === 'new' && (
                         <>
                             <div className="brand-header">
-                                <h1 className="text-xl font-bold tracking-tighter text-center">
-                                    DbSSTUDIO
-                                    <span className="ml-2 font-light text-xs text-gray-400 tracking-widest block mt-1">v3.5 ARCHIVE</span>
-                                </h1>
+                                <img src="./brand_logo.png" alt="DbSSTUDIO" className="w-[180px] h-auto object-contain mx-auto" />
                             </div>
 
                             <div className="sticky-tabs">
@@ -490,11 +494,11 @@
                             <div className="style-preview">
                                 <div className="ghost-canvas-container h-full w-full bg-white">
                                     {/* Z-Index: Shoes(10), Bottom(20), Tops(30) */}
-                                    {outfit.shoes && <img src={outfit.shoes.srcGhost} className="ghost-layer z-10" onError={(e)=>e.target.style.display='none'} />}
-                                    {outfit.bottom && <img src={outfit.bottom.srcGhost} className="ghost-layer z-20" onError={(e)=>e.target.style.display='none'} />}
-                                    {outfit.short_t && <img src={outfit.short_t.srcGhost} className="ghost-layer z-30" onError={(e)=>e.target.style.display='none'} />}
-                                    {outfit.long_t && <img src={outfit.long_t.srcGhost} className="ghost-layer z-30" onError={(e)=>e.target.style.display='none'} />}
-                                    {outfit.sweatshirt && <img src={outfit.sweatshirt.srcGhost} className="ghost-layer z-30" onError={(e)=>e.target.style.display='none'} />}
+                                    {outfit.shoes && <img src={outfit.shoes.srcGhost} className="ghost-layer z-10" onError={(e)=>handleGridImgError(e, outfit.shoes)} />}
+                                    {outfit.bottom && <img src={outfit.bottom.srcGhost} className="ghost-layer z-20" onError={(e)=>handleGridImgError(e, outfit.bottom)} />}
+                                    {outfit.short_t && <img src={outfit.short_t.srcGhost} className="ghost-layer z-30" onError={(e)=>handleGridImgError(e, outfit.short_t)} />}
+                                    {outfit.long_t && <img src={outfit.long_t.srcGhost} className="ghost-layer z-30" onError={(e)=>handleGridImgError(e, outfit.long_t)} />}
+                                    {outfit.sweatshirt && <img src={outfit.sweatshirt.srcGhost} className="ghost-layer z-30" onError={(e)=>handleGridImgError(e, outfit.sweatshirt)} />}
                                     
                                     {(!outfit.bottom && !outfit.shoes && !outfit.short_t && !outfit.long_t && !outfit.sweatshirt) && (
                                         <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-300">
@@ -537,7 +541,7 @@
                     {/* PAGE 3: CONTACT */}
                     {activeTab === 'contact' && (
                         <div className="content-area p-8 flex flex-col justify-center text-center min-h-full">
-                            <h2 className="text-xl font-bold mb-2">DbSSTUDIO</h2>
+                            <img src="./brand_logo.png" alt="DbSSTUDIO" className="w-[180px] h-auto object-contain mx-auto mb-8" />
                             <p className="text-xs text-gray-400 tracking-widest mb-8">ARCHIVE 2026</p>
                             <p className="text-xs leading-6 text-gray-600 mb-8">
                                 極簡主義與實用美學的交匯點。<br/>
