@@ -1,14 +1,14 @@
-<!-- DbSSTUDIO-Showroom.v3.6.html -->
+<!-- DbSSTUDIO-Showroom.v3.7.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>DbSSTUDIO v3.6 - Stable Archive 2026</title>
+    <title>DbSSTUDIO v3.7 - Ultimate Archive 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [DbSSTUDIO v3.6 - Visual Identity & Stability] */
+        /* [DbSSTUDIO v3.7 - Integrity & Stability] */
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             -webkit-font-smoothing: antialiased; 
@@ -27,7 +27,6 @@
             background-color: #fff; position: relative;
             box-shadow: 0 0 40px rgba(0,0,0,0.05);
             display: flex; flex-direction: column; overflow: hidden;
-            /* Safe Area for iOS */
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
         }
@@ -50,37 +49,24 @@
         .brand-header {
             padding: 20px 0 10px 0;
             background: #fff; 
-            display: flex; 
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            display: flex; flex-direction: column; align-items: center;
             border-bottom: 1px solid #f9f9f9;
         }
-        .brand-logo {
-            width: 180px; height: auto; object-fit: contain;
-        }
-        .version-tag {
-            font-size: 10px; color: #999; margin-top: 4px; letter-spacing: 1px;
-        }
+        .brand-logo { width: 180px; height: auto; object-fit: contain; }
+        .version-tag { font-size: 10px; color: #999; margin-top: 4px; letter-spacing: 1px; }
 
         /* 3-Column Grid */
         .catalog-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1px;
-            background-color: #f0f0f0;
-            padding-bottom: 40px;
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 1px; background-color: #f0f0f0; padding-bottom: 40px;
         }
         .grid-item {
-            background-color: #fff;
-            aspect-ratio: 3/4;
-            position: relative;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background-color: #fff; aspect-ratio: 3/4;
+            position: relative; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
             overflow: hidden;
         }
+        /* v3.7 Fix: Ensure image fills correctly */
         .grid-item img {
             width: 100%; height: 100%; object-fit: contain; padding: 4px;
             transition: transform 0.3s ease;
@@ -97,21 +83,15 @@
         }
         .sticky-tabs::-webkit-scrollbar { display: none; }
         .tab-btn {
-            padding: 12px 16px;
-            font-size: 11px; font-weight: 600;
-            color: #999; whitespace: nowrap;
-            transition: all 0.2s;
+            padding: 12px 16px; font-size: 11px; font-weight: 600;
+            color: #999; whitespace: nowrap; transition: all 0.2s;
             border-bottom: 2px solid transparent;
         }
         .tab-btn.active { color: #000; border-bottom-color: #000; }
 
         /* Style Page */
         .style-layout { display: flex; flex-direction: column; height: 100%; }
-        
-        .style-preview {
-            flex: 1; position: relative;
-            background: #fff; overflow: hidden;
-        }
+        .style-preview { flex: 1; position: relative; background: #fff; overflow: hidden; }
         .ghost-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             object-fit: contain; object-position: bottom center;
@@ -119,8 +99,7 @@
         }
 
         .style-controls {
-            padding: 10px 12px;
-            border-top: 1px solid #f0f0f0;
+            padding: 10px 12px; border-top: 1px solid #f0f0f0;
             display: flex; flex-direction: column; gap: 10px;
             background: #fff; z-index: 30;
         }
@@ -143,7 +122,7 @@
         }
         .sub-btn.active { border-color: #000; color: #000; background: #fff; font-weight: 600; }
 
-        /* Style Thumbnails */
+        /* Thumbnails */
         .style-thumbnails {
             height: 110px; background: #fff;
             display: flex; gap: 8px; padding: 8px 12px;
@@ -157,10 +136,26 @@
             display: flex; align-items: center; justify-content: center;
             padding: 4px; cursor: pointer; transition: border-color 0.2s;
         }
-        .thumb-item[data-cat="shoes"] img { transform: scale(1.15); }
         .thumb-item.active { border-color: #000; background: #f9f9f9; }
         .thumb-item img { width: 100%; height: 100%; object-fit: contain; }
-        .thumb-item.hidden { display: none; }
+
+        /* Lightbox */
+        .lightbox-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.99); z-index: 99999;
+            animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: auto; -webkit-overflow-scrolling: touch;
+        }
+        .lightbox-scroll-wrapper {
+            min-width: 100%; min-height: 100%;
+            display: flex; justify-content: center; align-items: flex-start;
+            padding-top: 5vh; padding-bottom: 10vh;
+        }
+        .lightbox-img {
+            width: 150vw !important; max-width: none !important;
+            height: auto !important; transform: translateY(-5%);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.1); cursor: grab;
+        }
 
         /* Detail Modal */
         .detail-modal {
@@ -221,9 +216,9 @@
             margin-bottom: env(safe-area-inset-bottom);
         }
         .cart-badge {
-            position: absolute; top: 0; right: 0;
-            width: 16px; height: 16px; background: #FF3B30;
-            border-radius: 50%; font-size: 9px; display: flex; align-items: center; justify-content: center;
+            position: absolute; top: 0; right: 0; width: 16px; height: 16px; 
+            background: #FF3B30; border-radius: 50%; font-size: 9px; 
+            display: flex; align-items: center; justify-content: center;
         }
     </style>
 </head>
@@ -237,15 +232,17 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
-        // --- 1. DATA CONFIG (v3.6 Unlocked) ---
+        // --- 1. DATA CONFIG (v3.7) ---
+        // Inventory unlocked to 30 for bottoms
         const COUNTS = {
             short_t: 20,
             long_t: 20,
             sweatshirt: 15,
-            bottom: 30, // Limit unlocked to 30 for B001-B030
-            shoes: 15   // Fixed: s(5)+w(5)+x(5)
+            bottom: 30, // Unlocked
+            shoes: 15   // 5s + 5w + 5x
         };
 
+        // Localized Categories
         const CATEGORIES = [
             { id: 'short_t', label: '短T', prefix: 'st', name: 'Cotton Tee', count: COUNTS.short_t },
             { id: 'long_t', label: '長T', prefix: 'lt', name: 'Layering Long', count: COUNTS.long_t },
@@ -271,6 +268,47 @@
                 eye: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             };
             return icons[name] ? React.cloneElement(icons[name], { className }) : null;
+        };
+
+        // --- SMART IMAGE COMPONENT (v3.7) ---
+        // Tries: 1. No zero (st1), 2. One zero (st01), 3. Two zeros (st001)
+        const SmartImage = ({ prefix, index, suffix, className, alt, onClick }) => {
+            const [src, setSrc] = useState('');
+            const [errorCount, setErrorCount] = useState(0);
+            
+            // Path candidates
+            const candidates = useMemo(() => [
+                `./${prefix}${index}${suffix}`,
+                `./${prefix}${String(index).padStart(2, '0')}${suffix}`,
+                `./${prefix}${String(index).padStart(3, '0')}${suffix}`
+            ], [prefix, index, suffix]);
+
+            useEffect(() => {
+                setSrc(candidates[0]);
+                setErrorCount(0);
+            }, [candidates]);
+
+            const handleError = () => {
+                if (errorCount < candidates.length - 1) {
+                    setSrc(candidates[errorCount + 1]);
+                    setErrorCount(prev => prev + 1);
+                } else {
+                    // All failed
+                    setSrc(''); // Will trigger hiding via CSS or parent
+                }
+            };
+
+            if (!src) return null; // Hide if all failed
+
+            return (
+                <img 
+                    src={src} 
+                    className={className} 
+                    alt={alt} 
+                    onClick={onClick}
+                    onError={handleError}
+                />
+            );
         };
 
         // --- COMPONENTS ---
@@ -308,21 +346,19 @@
 
         const DetailModal = ({ item, onClose, onAdd }) => {
             const [size, setSize] = useState(null);
-            
-            const handleImgError = (e) => {
-                // Smart Fallback: try different formats
-                if (e.target.src.includes('_d.png')) {
-                    e.target.src = item.srcOriginal;
-                }
-            };
-
             return (
                 <div className="detail-modal">
                     <div className="absolute top-0 w-full p-4 flex justify-end z-20 mt-8">
                         <button onClick={onClose} className="bg-white rounded-full p-2 shadow-md"><Icon name="x" className="w-6 h-6" /></button>
                     </div>
                     <div className="detail-image-area">
-                        <img src={item.srcDisplay} className="detail-img" alt={item.id} onError={handleImgError} />
+                        <SmartImage 
+                            prefix={item.rawPrefix} 
+                            index={item.rawIndex} 
+                            suffix="_d.png" 
+                            className="detail-img" 
+                            alt={item.id} 
+                        />
                     </div>
                     <div className="detail-controls">
                         <div className="flex justify-between items-center mb-4">
@@ -351,6 +387,25 @@
             </div>
         );
 
+        // 2. Lightbox (v3.7)
+        const Lightbox = ({ src, onClose }) => {
+            return (
+                <div className="lightbox-container" onClick={onClose}>
+                    <button className="absolute top-6 right-6 p-4 bg-black text-white rounded-full z-[100000] hover:scale-110 transition-transform shadow-lg sticky top-6 float-right mr-6 mt-6" onClick={onClose}>
+                        <Icon name="x" className="w-6 h-6" />
+                    </button>
+                    <div className="lightbox-scroll-wrapper">
+                        <img 
+                            src={src} 
+                            className="lightbox-img" 
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} 
+                            alt="Detail Zoom"
+                        />
+                    </div>
+                </div>
+            );
+        };
+
         // --- MAIN APP ---
         const App = () => {
             const [activeTab, setActiveTab] = useState('new');
@@ -363,43 +418,38 @@
             const [inquiryList, setInquiryList] = useState([]);
             const [showCart, setShowCart] = useState(false);
             const [showSizeGuide, setShowSizeGuide] = useState(false);
+            const [zoomSrc, setZoomSrc] = useState(null);
 
             const [outfit, setOutfit] = useState({ short_t: null, long_t: null, sweatshirt: null, bottom: null, shoes: null });
             
             const carouselRef = useRef(null);
 
-            // Catalog Generation (v3.6 Data Unlocked)
+            // Catalog Generation (v3.7)
             const catalog = useMemo(() => {
                 let items = [];
                 CATEGORIES.forEach(cat => {
                     for(let i=1; i<=cat.count; i++) {
-                        let baseName = '';
-                        // 3-Digit Padding
-                        const idSuffix = String(i).padStart(3, '0');
+                        let prefix = '';
+                        let rawIndex = i;
 
-                        // Logic for Shoes/Bottoms vs Tops
                         if (cat.id === 'shoes') {
-                            if (i <= 5) baseName = `s${String(i).padStart(3, '0')}`;
-                            else if (i <= 10) baseName = `w${String(i-5).padStart(3, '0')}`;
-                            else baseName = `x${String(i-10).padStart(3, '0')}`;
-                        } else if (cat.id === 'bottom') {
-                            baseName = `b${idSuffix}`;
+                            if (i <= 5) { prefix = 's'; rawIndex = i; }
+                            else if (i <= 10) { prefix = 'w'; rawIndex = i-5; }
+                            else { prefix = 'x'; rawIndex = i-10; }
                         } else {
-                            baseName = `${cat.prefix}${idSuffix}`;
+                            prefix = cat.prefix;
                         }
 
-                        const d_src = `${baseName}_d.png`;
-                        const g_src = `${baseName}_g.png`;
-                        const o_src = `${baseName}.png`;
+                        // Generate Display ID (e.g., ST001)
+                        const displayID = `${prefix.toUpperCase()}${String(rawIndex).padStart(3, '0')}`;
 
                         items.push({
                             uid: `${cat.id}-${i}`,
-                            id: baseName.toUpperCase(),
+                            id: displayID,
                             catId: cat.id,
                             name: cat.name,
-                            srcDisplay: `./${d_src}`,
-                            srcGhost: `./${g_src}`,
-                            srcOriginal: `./${o_src}`,
+                            rawPrefix: prefix,
+                            rawIndex: rawIndex,
                             slot: cat.id
                         });
                     }
@@ -407,13 +457,12 @@
                 return items;
             }, []);
 
-            // Catalog Filter
+            // Filters
             const filteredCatalog = useMemo(() => {
                 if (catalogTab === 'all') return catalog;
                 return catalog.filter(i => i.catId === catalogTab);
             }, [catalog, catalogTab]);
 
-            // Style Thumbnail Logic
             const styleThumbnails = useMemo(() => {
                 let pool = [];
                 if (styleCategory === 'tops') {
@@ -455,19 +504,6 @@
                 });
             };
 
-            const handleGridImgError = (e, item) => {
-                // Try fallback to original if _d fails
-                if (e.target.src.includes('_d.png')) {
-                    e.target.src = item.srcOriginal;
-                } else {
-                    e.target.parentElement.style.display = 'none'; // Hide grid item if both fail
-                }
-            };
-
-            const handleThumbError = (e) => {
-                e.target.parentElement.style.display = 'none'; // Hide thumb item
-            };
-
             return (
                 <div className="app-container">
                     
@@ -476,7 +512,7 @@
                         <>
                             <div className="brand-header">
                                 <img src="./brand_logo.png" alt="DbSSTUDIO" className="brand-logo" />
-                                <span className="version-tag">v3.6 Ultimate Archive</span>
+                                <span className="version-tag">v3.7 Ultimate Archive</span>
                             </div>
 
                             <div className="sticky-tabs">
@@ -492,10 +528,11 @@
                                 <div className="catalog-grid">
                                     {filteredCatalog.map(item => (
                                         <div key={item.uid} className="grid-item" onClick={() => setDetailItem(item)}>
-                                            <img 
-                                                src={item.srcDisplay} 
+                                            <SmartImage 
+                                                prefix={item.rawPrefix} 
+                                                index={item.rawIndex} 
+                                                suffix="_d.png" 
                                                 alt={item.id} 
-                                                onError={(e) => handleGridImgError(e, item)} 
                                             />
                                             <div className="absolute bottom-1 right-1 text-[8px] text-gray-400">{item.id}</div>
                                         </div>
@@ -511,12 +548,12 @@
                         <div className="style-layout">
                             <div className="style-preview">
                                 <div className="ghost-canvas-container h-full w-full bg-white">
-                                    {/* Z-Index: Shoes(10), Bottom(20), Tops(30) */}
-                                    {outfit.shoes && <img src={outfit.shoes.srcGhost} className="ghost-layer z-10" onError={(e)=>e.target.style.display='none'} />}
-                                    {outfit.bottom && <img src={outfit.bottom.srcGhost} className="ghost-layer z-20" onError={(e)=>e.target.style.display='none'} />}
-                                    {outfit.short_t && <img src={outfit.short_t.srcGhost} className="ghost-layer z-30" onError={(e)=>e.target.style.display='none'} />}
-                                    {outfit.long_t && <img src={outfit.long_t.srcGhost} className="ghost-layer z-30" onError={(e)=>e.target.style.display='none'} />}
-                                    {outfit.sweatshirt && <img src={outfit.sweatshirt.srcGhost} className="ghost-layer z-30" onError={(e)=>e.target.style.display='none'} />}
+                                    {/* Layers Z-Index: Shoes(10), Bottom(20), Tops(30) */}
+                                    {outfit.shoes && <SmartImage prefix={outfit.shoes.rawPrefix} index={outfit.shoes.rawIndex} suffix="_g.png" className="ghost-layer z-10" />}
+                                    {outfit.bottom && <SmartImage prefix={outfit.bottom.rawPrefix} index={outfit.bottom.rawIndex} suffix="_g.png" className="ghost-layer z-20" />}
+                                    {outfit.short_t && <SmartImage prefix={outfit.short_t.rawPrefix} index={outfit.short_t.rawIndex} suffix="_g.png" className="ghost-layer z-30" />}
+                                    {outfit.long_t && <SmartImage prefix={outfit.long_t.rawPrefix} index={outfit.long_t.rawIndex} suffix="_g.png" className="ghost-layer z-30" />}
+                                    {outfit.sweatshirt && <SmartImage prefix={outfit.sweatshirt.rawPrefix} index={outfit.sweatshirt.rawIndex} suffix="_g.png" className="ghost-layer z-30" />}
                                     
                                     {(!outfit.bottom && !outfit.shoes && !outfit.short_t && !outfit.long_t && !outfit.sweatshirt) && (
                                         <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-300">
@@ -547,7 +584,7 @@
                             <div className="style-thumbnails" ref={carouselRef}>
                                 {styleThumbnails.map(item => (
                                     <div key={item.uid} className="thumb-item" data-cat={item.catId} onClick={() => handleManualStyle(item)}>
-                                        <img src={item.srcDisplay} alt={item.id} onError={handleThumbError} />
+                                        <SmartImage prefix={item.rawPrefix} index={item.rawIndex} suffix="_d.png" />
                                     </div>
                                 ))}
                             </div>
