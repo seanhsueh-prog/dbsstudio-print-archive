@@ -1,21 +1,21 @@
-<!-- DbSSTUDIO-Showroom.v3.7.html -->
+<!-- DbSSTUDIO-Showroom.v3.8.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>DbSSTUDIO v3.7 - Ultimate Archive 2026</title>
+    <title>DbSSTUDIO v3.8 - Ultimate Archive 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* [DbSSTUDIO v3.7 - Integrity & Stability] */
+        /* [DbSSTUDIO v3.8 - Ultimate Path Fix] */
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             -webkit-font-smoothing: antialiased; 
             background-color: #F9F9F9; 
             color: #111; 
             margin: 0;
-            height: 100dvh; /* Dynamic Height */
+            height: 100dvh; 
             overflow: hidden; 
             display: flex;
             justify-content: center; 
@@ -66,9 +66,9 @@
             display: flex; align-items: center; justify-content: center;
             overflow: hidden;
         }
-        /* v3.7 Fix: Ensure image fills correctly */
+        /* v3.8: Increased Padding to 8px */
         .grid-item img {
-            width: 100%; height: 100%; object-fit: contain; padding: 4px;
+            width: 100%; height: 100%; object-fit: contain; padding: 8px;
             transition: transform 0.3s ease;
         }
         .grid-item:active img { transform: scale(0.95); }
@@ -232,7 +232,7 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
-        // --- 1. DATA CONFIG (v3.7) ---
+        // --- 1. DATA CONFIG (v3.8 Unlocked) ---
         // Inventory unlocked to 30 for bottoms
         const COUNTS = {
             short_t: 20,
@@ -242,7 +242,6 @@
             shoes: 15   // 5s + 5w + 5x
         };
 
-        // Localized Categories
         const CATEGORIES = [
             { id: 'short_t', label: '短T', prefix: 'st', name: 'Cotton Tee', count: COUNTS.short_t },
             { id: 'long_t', label: '長T', prefix: 'lt', name: 'Layering Long', count: COUNTS.long_t },
@@ -270,17 +269,18 @@
             return icons[name] ? React.cloneElement(icons[name], { className }) : null;
         };
 
-        // --- SMART IMAGE COMPONENT (v3.7) ---
-        // Tries: 1. No zero (st1), 2. One zero (st01), 3. Two zeros (st001)
-        const SmartImage = ({ prefix, index, suffix, className, alt, onClick }) => {
+        // --- SMART IMAGE COMPONENT (v3.8 Ultimate Fix) ---
+        // Tries 4 patterns: No Zero, 1 Zero, 2 Zeros, 3 Zeros
+        const SmartImage = ({ prefix, index, suffix, className, alt, onClick, onHide }) => {
             const [src, setSrc] = useState('');
             const [errorCount, setErrorCount] = useState(0);
             
-            // Path candidates
+            // v3.8: 4 Candidates to ensure no broken images
             const candidates = useMemo(() => [
                 `./${prefix}${index}${suffix}`,
                 `./${prefix}${String(index).padStart(2, '0')}${suffix}`,
-                `./${prefix}${String(index).padStart(3, '0')}${suffix}`
+                `./${prefix}${String(index).padStart(3, '0')}${suffix}`,
+                `./${prefix}${String(index).padStart(4, '0')}${suffix}`
             ], [prefix, index, suffix]);
 
             useEffect(() => {
@@ -293,12 +293,12 @@
                     setSrc(candidates[errorCount + 1]);
                     setErrorCount(prev => prev + 1);
                 } else {
-                    // All failed
-                    setSrc(''); // Will trigger hiding via CSS or parent
+                    // All failed: Hide parent if callback provided, or self
+                    if(onHide) onHide();
                 }
             };
 
-            if (!src) return null; // Hide if all failed
+            if (errorCount >= candidates.length) return null;
 
             return (
                 <img 
@@ -346,6 +346,7 @@
 
         const DetailModal = ({ item, onClose, onAdd }) => {
             const [size, setSize] = useState(null);
+            
             return (
                 <div className="detail-modal">
                     <div className="absolute top-0 w-full p-4 flex justify-end z-20 mt-8">
@@ -387,7 +388,7 @@
             </div>
         );
 
-        // 2. Lightbox (v3.7)
+        // 2. Lightbox (v3.8)
         const Lightbox = ({ src, onClose }) => {
             return (
                 <div className="lightbox-container" onClick={onClose}>
@@ -418,13 +419,12 @@
             const [inquiryList, setInquiryList] = useState([]);
             const [showCart, setShowCart] = useState(false);
             const [showSizeGuide, setShowSizeGuide] = useState(false);
-            const [zoomSrc, setZoomSrc] = useState(null);
 
             const [outfit, setOutfit] = useState({ short_t: null, long_t: null, sweatshirt: null, bottom: null, shoes: null });
             
             const carouselRef = useRef(null);
 
-            // Catalog Generation (v3.7)
+            // Catalog Generation (v3.8 Data Unlocked)
             const catalog = useMemo(() => {
                 let items = [];
                 CATEGORIES.forEach(cat => {
@@ -512,7 +512,7 @@
                         <>
                             <div className="brand-header">
                                 <img src="./brand_logo.png" alt="DbSSTUDIO" className="brand-logo" />
-                                <span className="version-tag">v3.7 Ultimate Archive</span>
+                                <span className="version-tag">v3.8 Ultimate Archive 2026</span>
                             </div>
 
                             <div className="sticky-tabs">
@@ -532,8 +532,10 @@
                                                 prefix={item.rawPrefix} 
                                                 index={item.rawIndex} 
                                                 suffix="_d.png" 
-                                                alt={item.id} 
+                                                alt={item.id}
+                                                onHide={() => document.getElementById(`grid-${item.uid}`).style.display='none'}
                                             />
+                                            <div id={`grid-${item.uid}`} className="absolute inset-0 pointer-events-none"></div> {/* Hack for hiding parent */}
                                             <div className="absolute bottom-1 right-1 text-[8px] text-gray-400">{item.id}</div>
                                         </div>
                                     ))}
@@ -584,7 +586,13 @@
                             <div className="style-thumbnails" ref={carouselRef}>
                                 {styleThumbnails.map(item => (
                                     <div key={item.uid} className="thumb-item" data-cat={item.catId} onClick={() => handleManualStyle(item)}>
-                                        <SmartImage prefix={item.rawPrefix} index={item.rawIndex} suffix="_d.png" />
+                                        <SmartImage 
+                                            prefix={item.rawPrefix} 
+                                            index={item.rawIndex} 
+                                            suffix="_d.png" 
+                                            onHide={() => document.getElementById(`thumb-${item.uid}`).style.display='none'}
+                                        />
+                                        <div id={`thumb-${item.uid}`} className="hidden"></div>
                                     </div>
                                 ))}
                             </div>
