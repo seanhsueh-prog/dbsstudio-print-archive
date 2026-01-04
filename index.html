@@ -1,4 +1,4 @@
-<!-- DbSSTUDIO-Showroom.v4.6.html -->
+<!-- DbSSTUDIO-Showroom.v4.7.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -7,14 +7,14 @@
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title>DbSSTUDIO v4.6 - Ultimate Archive</title>
+    <title>DbSSTUDIO v4.7 - Ultimate Archive</title>
     
     <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* [DbSSTUDIO v4.6 - Core Layout Engine] */
+        /* [DbSSTUDIO v4.7 - Core Layout Engine] */
         html, body, #root { 
             width: 100%; height: 100dvh; margin: 0; padding: 0; 
             overflow: hidden; background: #000; 
@@ -39,7 +39,13 @@
         .fade-in { animation: fadeIn 0.3s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Grid - Clean Style */
+        /* Global Smart Image Transition (Fixes icons everywhere) */
+        .smart-img-base {
+            opacity: 0; transition: opacity 0.3s ease, transform 0.4s ease;
+        }
+        .smart-img-base.loaded { opacity: 1; }
+
+        /* Grid */
         .catalog-grid {
             display: grid; grid-template-columns: repeat(3, 1fr);
             gap: 1px; background-color: #f2f2f2; padding-bottom: 120px;
@@ -48,14 +54,9 @@
             background: #fff; aspect-ratio: 3/4; position: relative;
             cursor: pointer; overflow: hidden;
         }
-        /* v4.6 Update: Image starts invisible to hide broken icon */
         .grid-item img {
             width: 100%; height: 100%; object-fit: contain; padding: 8px;
-            transition: opacity 0.3s ease, transform 0.4s ease;
-            opacity: 0; /* Default invisible */
         }
-        .grid-item img.loaded { opacity: 1; } /* Only show when loaded */
-        
         .grid-item:active img { transform: scale(0.95); }
 
         /* Style Room Layers */
@@ -128,17 +129,17 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useRef } = React;
 
-        // --- 1. CONFIGURATION (v4.6) ---
+        // --- 1. CONFIGURATION (v4.7) ---
         const CONFIG = [
             { id: 'short_t', group: 'Tops', label: '短T', prefix: 'st', count: 20 },
             { id: 'long_t',  group: 'Tops', label: '長T', prefix: 'lt', count: 20 },
             { id: 'sweatshirt', group: 'Tops', label: '衛衣', prefix: 'sw', count: 15 },
             { id: 'bottom',  group: 'Pants', label: '褲裝', prefix: 'b',  count: 30 },
-            { id: 'shoes',   group: 'Shoes', label: '鞋履', prefix: 's',  count: 15 }
+            { id: 'shoes',   group: 'Shoes', label: '鞋履', prefix: 's',  count: 15 } // Base config, overridden in generation
         ];
 
+        // v4.7: Removed 'All' Tab
         const CATALOG_TABS = [
-            { id: 'All', label: '全部' },
             { id: 'short_t', label: '短T' },
             { id: 'long_t', label: '長T' },
             { id: 'sweatshirt', label: '衛衣' },
@@ -169,11 +170,10 @@
             );
         };
 
-        // v4.6 FIX: Invisible Loading Logic
         const SmartImage = ({ prefix, index, suffix, className, onClick, style, onHide }) => {
             const [src, setSrc] = useState('');
             const [errorStep, setErrorStep] = useState(0);
-            const [loaded, setLoaded] = useState(false); // New state to track loading success
+            const [loaded, setLoaded] = useState(false);
 
             const candidates = useMemo(() => {
                 const sIdx = String(index);
@@ -188,7 +188,7 @@
             useEffect(() => {
                 setSrc(candidates[0]);
                 setErrorStep(0);
-                setLoaded(false); // Reset loaded state on new image
+                setLoaded(false);
             }, [candidates]);
 
             const handleError = () => {
@@ -197,19 +197,19 @@
                     setSrc(candidates[next]);
                     setErrorStep(next);
                 } else {
-                    // All Failed: Hide
                     if(onHide) onHide();
                 }
             };
 
+            // v4.7: Apply generic smart-img-base class for consistent fading
             return (
                 <img 
                     src={src} 
-                    className={`${className} ${loaded ? 'loaded' : ''}`} // Add class on load
+                    className={`smart-img-base ${loaded ? 'loaded' : ''} ${className}`}
                     alt="" 
                     onClick={onClick}
                     onError={handleError}
-                    onLoad={() => setLoaded(true)} // Mark as loaded
+                    onLoad={() => setLoaded(true)}
                     style={style}
                 />
             );
@@ -316,8 +316,9 @@
 
         // --- 3. MAIN APPLICATION ---
         const App = () => {
+            // v4.7: Default page filter is 'short_t' (removed All)
             const [page, setPage] = useState('catalog');
-            const [filter, setFilter] = useState('All');
+            const [filter, setFilter] = useState('short_t');
             const [cart, setCart] = useState([]);
             const [detailItem, setDetailItem] = useState(null);
             const [isCartOpen, setIsCartOpen] = useState(false);
@@ -327,18 +328,28 @@
             const [styleMode, setStyleMode] = useState('Tops');
             const [styleSubFilter, setStyleSubFilter] = useState('All');
 
-            // Data Generation
+            // Data Generation (v4.7: Restored v3.8 Shoe Logic)
             const catalog = useMemo(() => {
                 let list = [];
                 CONFIG.forEach(cfg => {
                     for(let i=1; i<=cfg.count; i++){
+                        let prefix = cfg.prefix;
+                        let rawIndex = i;
+
+                        // v4.7 Restore Shoe Logic: 1-5(s), 6-10(w), 11-15(x)
+                        if (cfg.id === 'shoes') {
+                            if (i <= 5) { prefix = 's'; rawIndex = i; }
+                            else if (i <= 10) { prefix = 'w'; rawIndex = i-5; }
+                            else { prefix = 'x'; rawIndex = i-10; }
+                        }
+
                         list.push({
                             uid: `${cfg.id}-${i}`,
-                            displayId: `${cfg.prefix.toUpperCase()}${String(i).padStart(3,'0')}`,
+                            displayId: `${prefix.toUpperCase()}${String(rawIndex).padStart(3,'0')}`,
                             group: cfg.group,
                             categoryId: cfg.id, 
-                            rawPrefix: cfg.prefix,
-                            rawIndex: i,
+                            rawPrefix: prefix,
+                            rawIndex: rawIndex,
                             name: cfg.label
                         });
                     }
@@ -348,7 +359,7 @@
 
             // Catalog Filtering
             const filteredItems = useMemo(() => {
-                if(filter === 'All') return catalog;
+                // v4.7: 'All' is removed, so we strictly filter by category
                 return catalog.filter(c => c.categoryId === filter);
             }, [catalog, filter]);
 
@@ -391,7 +402,7 @@
                         <>
                             <div className="bg-white pt-6 pb-4 flex flex-col items-center border-b border-gray-50">
                                 <img src="./brand_logo.png" alt="DbS" className="w-[180px] object-contain mb-2" />
-                                <span className="text-[9px] text-gray-400 tracking-[0.3em] font-medium">v4.6 Ultimate Archive</span>
+                                <span className="text-[9px] text-gray-400 tracking-[0.3em] font-medium">v4.7 Ultimate Archive</span>
                             </div>
 
                             <div className="sticky-tabs">
@@ -411,6 +422,7 @@
                                                 prefix={item.rawPrefix} 
                                                 index={item.rawIndex} 
                                                 suffix="_d.png" 
+                                                className="w-full h-full object-contain"
                                                 onHide={() => {
                                                     const el = document.getElementById(`cat-${item.uid}`);
                                                     if(el) el.style.display = 'none';
