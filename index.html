@@ -1,4 +1,4 @@
-<!-- DbSSTUDIO-Showroom.v4.7.html -->
+<!-- DbSSTUDIO-Showroom.v4.8.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -7,14 +7,14 @@
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title>DbSSTUDIO v4.7 - Ultimate Archive</title>
+    <title>DbSSTUDIO v4.8 - Ultimate Archive</title>
     
     <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* [DbSSTUDIO v4.7 - Core Layout Engine] */
+        /* [DbSSTUDIO v4.8 - Core Layout Engine] */
         html, body, #root { 
             width: 100%; height: 100dvh; margin: 0; padding: 0; 
             overflow: hidden; background: #000; 
@@ -39,9 +39,9 @@
         .fade-in { animation: fadeIn 0.3s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Global Smart Image Transition (Fixes icons everywhere) */
+        /* Global Smart Image Transition */
         .smart-img-base {
-            opacity: 0; transition: opacity 0.3s ease, transform 0.4s ease;
+            opacity: 0; transition: opacity 0.2s ease, transform 0.3s ease;
         }
         .smart-img-base.loaded { opacity: 1; }
 
@@ -129,16 +129,15 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useRef } = React;
 
-        // --- 1. CONFIGURATION (v4.7) ---
+        // --- 1. CONFIGURATION (v4.8) ---
         const CONFIG = [
             { id: 'short_t', group: 'Tops', label: '短T', prefix: 'st', count: 20 },
             { id: 'long_t',  group: 'Tops', label: '長T', prefix: 'lt', count: 20 },
             { id: 'sweatshirt', group: 'Tops', label: '衛衣', prefix: 'sw', count: 15 },
             { id: 'bottom',  group: 'Pants', label: '褲裝', prefix: 'b',  count: 30 },
-            { id: 'shoes',   group: 'Shoes', label: '鞋履', prefix: 's',  count: 15 } // Base config, overridden in generation
+            { id: 'shoes',   group: 'Shoes', label: '鞋履', prefix: 's',  count: 15 } 
         ];
 
-        // v4.7: Removed 'All' Tab
         const CATALOG_TABS = [
             { id: 'short_t', label: '短T' },
             { id: 'long_t', label: '長T' },
@@ -170,6 +169,7 @@
             );
         };
 
+        // v4.8: Optimized Loading Sequence (Prioritize 001)
         const SmartImage = ({ prefix, index, suffix, className, onClick, style, onHide }) => {
             const [src, setSrc] = useState('');
             const [errorStep, setErrorStep] = useState(0);
@@ -177,11 +177,12 @@
 
             const candidates = useMemo(() => {
                 const sIdx = String(index);
+                // v4.8 Speed Fix: Prioritize 3-digit padding (001) as it's the standard
                 return [
-                    `./${prefix}${sIdx.padStart(4, '0')}${suffix}`,
-                    `./${prefix}${sIdx.padStart(3, '0')}${suffix}`,
-                    `./${prefix}${sIdx.padStart(2, '0')}${suffix}`,
-                    `./${prefix}${index}${suffix}`
+                    `./${prefix}${sIdx.padStart(3, '0')}${suffix}`, // Priority 1: st001
+                    `./${prefix}${sIdx.padStart(4, '0')}${suffix}`, // Priority 2: st0001
+                    `./${prefix}${sIdx.padStart(2, '0')}${suffix}`, // Priority 3: st01
+                    `./${prefix}${index}${suffix}`                   // Priority 4: st1
                 ];
             }, [prefix, index, suffix]);
 
@@ -201,7 +202,6 @@
                 }
             };
 
-            // v4.7: Apply generic smart-img-base class for consistent fading
             return (
                 <img 
                     src={src} 
@@ -233,7 +233,8 @@
                         </button>
                     </div>
                     
-                    <div className="flex-1 flex items-center justify-center p-8 bg-gray-50 relative overflow-hidden">
+                    {/* v4.8: Maximized Image Area (Reduced padding, removed width cap) */}
+                    <div className="flex-1 flex items-center justify-center p-2 bg-gray-50 relative overflow-hidden">
                          <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
                             <span className="text-9xl font-bold">DbS</span>
                         </div>
@@ -241,7 +242,7 @@
                             prefix={item.rawPrefix} 
                             index={item.rawIndex} 
                             suffix="_d.png" 
-                            className="w-full max-w-sm h-auto drop-shadow-xl z-10" 
+                            className="w-full h-full object-contain drop-shadow-xl z-10" 
                         />
                     </div>
 
@@ -316,7 +317,6 @@
 
         // --- 3. MAIN APPLICATION ---
         const App = () => {
-            // v4.7: Default page filter is 'short_t' (removed All)
             const [page, setPage] = useState('catalog');
             const [filter, setFilter] = useState('short_t');
             const [cart, setCart] = useState([]);
@@ -328,7 +328,7 @@
             const [styleMode, setStyleMode] = useState('Tops');
             const [styleSubFilter, setStyleSubFilter] = useState('All');
 
-            // Data Generation (v4.7: Restored v3.8 Shoe Logic)
+            // Data Generation
             const catalog = useMemo(() => {
                 let list = [];
                 CONFIG.forEach(cfg => {
@@ -336,7 +336,7 @@
                         let prefix = cfg.prefix;
                         let rawIndex = i;
 
-                        // v4.7 Restore Shoe Logic: 1-5(s), 6-10(w), 11-15(x)
+                        // Shoe Logic: 1-5(s), 6-10(w), 11-15(x)
                         if (cfg.id === 'shoes') {
                             if (i <= 5) { prefix = 's'; rawIndex = i; }
                             else if (i <= 10) { prefix = 'w'; rawIndex = i-5; }
@@ -359,7 +359,6 @@
 
             // Catalog Filtering
             const filteredItems = useMemo(() => {
-                // v4.7: 'All' is removed, so we strictly filter by category
                 return catalog.filter(c => c.categoryId === filter);
             }, [catalog, filter]);
 
@@ -402,7 +401,7 @@
                         <>
                             <div className="bg-white pt-6 pb-4 flex flex-col items-center border-b border-gray-50">
                                 <img src="./brand_logo.png" alt="DbS" className="w-[180px] object-contain mb-2" />
-                                <span className="text-[9px] text-gray-400 tracking-[0.3em] font-medium">v4.7 Ultimate Archive</span>
+                                <span className="text-[9px] text-gray-400 tracking-[0.3em] font-medium">v4.8 Ultimate Archive</span>
                             </div>
 
                             <div className="sticky-tabs">
