@@ -1,4 +1,4 @@
-<!-- DbSSTUDIO-Showroom.v4.4.html -->
+<!-- DbSSTUDIO-Showroom.v4.5.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -7,17 +7,17 @@
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title>DbSSTUDIO v4.4 - Ultimate Archive</title>
+    <title>DbSSTUDIO v4.5 - Ultimate Archive</title>
     
     <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* [DbSSTUDIO v4.4 - Core Layout Engine] */
+        /* [DbSSTUDIO v4.5 - Core Layout Engine] */
         html, body, #root { 
             width: 100%; height: 100dvh; margin: 0; padding: 0; 
-            overflow: hidden; background: #000; 
+            overflow: hidden; background: #000; /* Prevent white flash */
         }
         
         .app-container { 
@@ -39,10 +39,7 @@
         .fade-in { animation: fadeIn 0.3s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        /* Grid */
+        /* Grid - Clean Style */
         .catalog-grid {
             display: grid; grid-template-columns: repeat(3, 1fr);
             gap: 1px; background-color: #f2f2f2; padding-bottom: 120px;
@@ -52,7 +49,7 @@
             cursor: pointer; overflow: hidden;
         }
         .grid-item img {
-            width: 100%; height: 100%; object-fit: contain; padding: 10px;
+            width: 100%; height: 100%; object-fit: contain; padding: 8px;
             transition: transform 0.4s ease;
         }
         .grid-item:active img { transform: scale(0.95); }
@@ -66,8 +63,8 @@
 
         /* Nav & Tabs */
         .sticky-tabs {
-            position: sticky; top: 0; z-index: 40; background: rgba(255,255,255,0.96);
-            backdrop-filter: blur(12px); border-bottom: 1px solid #f0f0f0; 
+            position: sticky; top: 0; z-index: 40; background: rgba(255,255,255,0.98);
+            border-bottom: 1px solid #f0f0f0; 
             display: flex; overflow-x: auto;
         }
         .tab-btn {
@@ -76,6 +73,34 @@
             letter-spacing: 0.5px;
         }
         .tab-btn.active { color: #000; border-bottom-color: #000; }
+
+        /* Style Controls */
+        .style-controls {
+            background: #fff; border-top: 1px solid #f9f9f9;
+            z-index: 30; padding-bottom: 10px;
+        }
+        
+        .cat-switch {
+            display: flex; gap: 8px; padding: 12px;
+            overflow-x: auto; scrollbar-width: none;
+        }
+        .cat-btn {
+            padding: 8px 16px; border-radius: 99px;
+            font-size: 11px; font-weight: 600;
+            background: #f5f5f5; color: #888; white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .cat-btn.active { background: #000; color: #fff; }
+
+        .sub-filter-bar {
+            display: flex; gap: 6px; padding: 0 12px 8px 12px;
+            overflow-x: auto; scrollbar-width: none; animation: fadeIn 0.3s ease;
+        }
+        .sub-btn {
+            padding: 4px 12px; border-radius: 99px; border: 1px solid #eee;
+            font-size: 10px; color: #999; white-space: nowrap; transition: all 0.2s;
+        }
+        .sub-btn.active { border-color: #000; color: #000; font-weight: 600; background: #fff; }
 
         .bottom-nav {
             position: absolute; bottom: 0; left: 0; width: 100%;
@@ -95,10 +120,9 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+        const { useState, useEffect, useMemo, useRef } = React;
 
-        // --- 1. CONFIGURATION (v4.4) ---
-        // Inventory Config
+        // --- 1. CONFIGURATION (v4.5) ---
         const CONFIG = [
             { id: 'short_t', group: 'Tops', label: '短T', prefix: 'st', count: 20 },
             { id: 'long_t',  group: 'Tops', label: '長T', prefix: 'lt', count: 20 },
@@ -107,7 +131,6 @@
             { id: 'shoes',   group: 'Shoes', label: '鞋履', prefix: 's',  count: 15 }
         ];
 
-        // Catalog Tabs Definition (Restored v3.8 Logic)
         const CATALOG_TABS = [
             { id: 'All', label: '全部' },
             { id: 'short_t', label: '短T' },
@@ -130,7 +153,8 @@
                 hanger: <path d="M12 2a5 5 0 015 5v2h2v12H5V9h2V7a5 5 0 015-5z" />,
                 info: <><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></>,
                 plus: <path d="M12 5v14M5 12h14" />,
-                trash: <><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" /></>
+                trash: <><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" /></>,
+                eye: <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>
             };
             return (
                 <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -139,10 +163,10 @@
             );
         };
 
-        const SmartImage = ({ prefix, index, suffix, className, onClick, style }) => {
+        // v4.5: Supports onHide to remove parent element explicitly
+        const SmartImage = ({ prefix, index, suffix, className, onClick, style, onHide }) => {
             const [src, setSrc] = useState('');
             const [errorStep, setErrorStep] = useState(0);
-            const [isHidden, setIsHidden] = useState(false);
 
             const candidates = useMemo(() => {
                 const sIdx = String(index);
@@ -157,7 +181,6 @@
             useEffect(() => {
                 setSrc(candidates[0]);
                 setErrorStep(0);
-                setIsHidden(false);
             }, [candidates]);
 
             const handleError = () => {
@@ -166,7 +189,8 @@
                     setSrc(candidates[next]);
                     setErrorStep(next);
                 } else {
-                    setIsHidden(true);
+                    // All Candidates Failed: Trigger hide
+                    if(onHide) onHide();
                 }
             };
 
@@ -177,7 +201,7 @@
                     alt="" 
                     onClick={onClick}
                     onError={handleError}
-                    style={{ ...style, opacity: isHidden ? 0 : 1 }}
+                    style={style}
                 />
             );
         };
@@ -292,6 +316,7 @@
             // Style Room State
             const [outfit, setOutfit] = useState({ top: null, pant: null, shoes: null });
             const [styleMode, setStyleMode] = useState('Tops');
+            const [styleSubFilter, setStyleSubFilter] = useState('All');
 
             // Data Generation
             const catalog = useMemo(() => {
@@ -302,7 +327,7 @@
                             uid: `${cfg.id}-${i}`,
                             displayId: `${cfg.prefix.toUpperCase()}${String(i).padStart(3,'0')}`,
                             group: cfg.group,
-                            categoryId: cfg.id, // v4.4: Added for precise filtering
+                            categoryId: cfg.id, 
                             rawPrefix: cfg.prefix,
                             rawIndex: i,
                             name: cfg.label
@@ -312,13 +337,29 @@
                 return list;
             }, []);
 
-            // v4.4: Restored detailed filtering
+            // Catalog Filtering
             const filteredItems = useMemo(() => {
                 if(filter === 'All') return catalog;
                 return catalog.filter(c => c.categoryId === filter);
             }, [catalog, filter]);
 
-            // Cart Actions
+            // Style Room Filtering (with sub-filters)
+            const styleThumbnails = useMemo(() => {
+                let pool = [];
+                if (styleMode === 'Tops') {
+                    if (styleSubFilter === 'All') {
+                        pool = catalog.filter(c => c.group === 'Tops');
+                    } else {
+                        pool = catalog.filter(c => c.categoryId === styleSubFilter);
+                    }
+                } else if (styleMode === 'Pants') {
+                    pool = catalog.filter(c => c.categoryId === 'bottom');
+                } else if (styleMode === 'Shoes') {
+                    pool = catalog.filter(c => c.categoryId === 'shoes');
+                }
+                return pool;
+            }, [catalog, styleMode, styleSubFilter]);
+
             const addToCart = (item, size) => {
                 setCart(prev => [...prev, { ...item, size, cartId: Date.now() }]);
                 setDetailItem(null);
@@ -341,7 +382,7 @@
                         <>
                             <div className="bg-white pt-6 pb-4 flex flex-col items-center border-b border-gray-50">
                                 <img src="./brand_logo.png" alt="DbS" className="w-[180px] object-contain mb-2" />
-                                <span className="text-[9px] text-gray-400 tracking-[0.3em] font-medium">v4.4 Ultimate Archive</span>
+                                <span className="text-[9px] text-gray-400 tracking-[0.3em] font-medium">v4.5 Ultimate Archive</span>
                             </div>
 
                             <div className="sticky-tabs">
@@ -356,8 +397,16 @@
                             <div className="flex-1 overflow-y-auto no-scrollbar content-area bg-[#f9f9f9]">
                                 <div className="catalog-grid">
                                     {filteredItems.map(item => (
-                                        <div key={item.uid} className="grid-item" onClick={() => setDetailItem(item)}>
-                                            <SmartImage prefix={item.rawPrefix} index={item.rawIndex} suffix="_d.png" />
+                                        <div id={`cat-${item.uid}`} key={item.uid} className="grid-item" onClick={() => setDetailItem(item)}>
+                                            <SmartImage 
+                                                prefix={item.rawPrefix} 
+                                                index={item.rawIndex} 
+                                                suffix="_d.png" 
+                                                onHide={() => {
+                                                    const el = document.getElementById(`cat-${item.uid}`);
+                                                    if(el) el.style.display = 'none';
+                                                }}
+                                            />
                                             <div className="absolute bottom-1 right-2 text-[8px] font-mono text-gray-400">{item.displayId}</div>
                                         </div>
                                     ))}
@@ -390,24 +439,46 @@
                                 )}
                             </div>
 
-                            <div className="bg-white border-t border-gray-100 z-30 pb-[80px]">
-                                <div className="flex px-4 py-3 gap-3 border-b border-gray-50 overflow-x-auto no-scrollbar">
+                            <div className="style-controls pb-[80px]">
+                                <div className="cat-switch">
                                     {['Tops', 'Pants', 'Shoes'].map(m => (
-                                        <button key={m} onClick={() => setStyleMode(m)}
-                                            className={`px-4 py-2 rounded-full text-[10px] font-bold tracking-wider transition-all ${styleMode===m ? 'bg-black text-white shadow-md' : 'bg-gray-100 text-gray-500'}`}>
+                                        <button key={m} onClick={() => { setStyleMode(m); setStyleSubFilter('All'); }}
+                                            className={`cat-btn ${styleMode===m ? 'active' : ''}`}>
                                             {m === 'Tops' ? '上衣' : m === 'Pants' ? '褲裝' : '鞋履'}
                                         </button>
                                     ))}
                                 </div>
-                                <div className="h-[100px] flex items-center gap-2 px-3 overflow-x-auto no-scrollbar py-2">
-                                    {catalog.filter(i => i.group === styleMode).map(item => (
-                                        <div key={item.uid} 
+                                
+                                {/* Sub Filters for Tops */}
+                                {styleMode === 'Tops' && (
+                                    <div className="sub-filter-bar">
+                                        {['All', 'short_t', 'long_t', 'sweatshirt'].map(sub => (
+                                            <button key={sub} onClick={() => setStyleSubFilter(sub)}
+                                                className={`sub-btn ${styleSubFilter===sub ? 'active' : ''}`}>
+                                                {sub==='All'?'全部':sub==='short_t'?'短T':sub==='long_t'?'長T':'衛衣'}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+
+                                <div className="h-[100px] flex items-center gap-2 px-3 overflow-x-auto no-scrollbar py-2 border-t border-gray-50">
+                                    {styleThumbnails.map(item => (
+                                        <div id={`style-${item.uid}`} key={item.uid} 
                                             onClick={() => {
                                                 const key = styleMode === 'Tops' ? 'top' : styleMode === 'Pants' ? 'pant' : 'shoes';
                                                 setOutfit(prev => ({...prev, [key]: item}));
                                             }}
                                             className="min-w-[70px] h-[80px] border border-gray-100 rounded-md p-1 relative cursor-pointer hover:border-black transition-colors bg-white">
-                                            <SmartImage prefix={item.rawPrefix} index={item.rawIndex} suffix="_d.png" className="w-full h-full object-contain" />
+                                            <SmartImage 
+                                                prefix={item.rawPrefix} 
+                                                index={item.rawIndex} 
+                                                suffix="_d.png" 
+                                                className="w-full h-full object-contain" 
+                                                onHide={() => {
+                                                    const el = document.getElementById(`style-${item.uid}`);
+                                                    if(el) el.style.display = 'none';
+                                                }}
+                                            />
                                             {outfit[styleMode === 'Tops' ? 'top' : styleMode === 'Pants' ? 'pant' : 'shoes']?.uid === item.uid && 
                                                 <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-black rounded-full"></div>
                                             }
@@ -461,8 +532,6 @@
             );
         };
 
-        // --- 4. RENDER ---
-        console.log("v4.4 Render Initiated");
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
