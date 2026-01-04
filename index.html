@@ -1,4 +1,4 @@
-<!-- DbSSTUDIO-Showroom.v4.3.html -->
+<!-- DbSSTUDIO-Showroom.v4.4.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -7,14 +7,14 @@
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title>DbSSTUDIO v4.3 - Ultimate Archive</title>
+    <title>DbSSTUDIO v4.4 - Ultimate Archive</title>
     
     <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* [DbSSTUDIO v4.3 - Core Layout Engine] */
+        /* [DbSSTUDIO v4.4 - Core Layout Engine] */
         html, body, #root { 
             width: 100%; height: 100dvh; margin: 0; padding: 0; 
             overflow: hidden; background: #000; 
@@ -97,7 +97,8 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        // --- 1. CONFIGURATION (v4.3 CN) ---
+        // --- 1. CONFIGURATION (v4.4) ---
+        // Inventory Config
         const CONFIG = [
             { id: 'short_t', group: 'Tops', label: '短T', prefix: 'st', count: 20 },
             { id: 'long_t',  group: 'Tops', label: '長T', prefix: 'lt', count: 20 },
@@ -105,6 +106,17 @@
             { id: 'bottom',  group: 'Pants', label: '褲裝', prefix: 'b',  count: 30 },
             { id: 'shoes',   group: 'Shoes', label: '鞋履', prefix: 's',  count: 15 }
         ];
+
+        // Catalog Tabs Definition (Restored v3.8 Logic)
+        const CATALOG_TABS = [
+            { id: 'All', label: '全部' },
+            { id: 'short_t', label: '短T' },
+            { id: 'long_t', label: '長T' },
+            { id: 'sweatshirt', label: '衛衣' },
+            { id: 'bottom', label: '褲裝' },
+            { id: 'shoes', label: '鞋履' }
+        ];
+
         const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
         const LINE_ID = "@dbsstudio";
 
@@ -290,6 +302,7 @@
                             uid: `${cfg.id}-${i}`,
                             displayId: `${cfg.prefix.toUpperCase()}${String(i).padStart(3,'0')}`,
                             group: cfg.group,
+                            categoryId: cfg.id, // v4.4: Added for precise filtering
                             rawPrefix: cfg.prefix,
                             rawIndex: i,
                             name: cfg.label
@@ -299,8 +312,10 @@
                 return list;
             }, []);
 
+            // v4.4: Restored detailed filtering
             const filteredItems = useMemo(() => {
-                return filter === 'All' ? catalog : catalog.filter(c => c.group === filter);
+                if(filter === 'All') return catalog;
+                return catalog.filter(c => c.categoryId === filter);
             }, [catalog, filter]);
 
             // Cart Actions
@@ -326,14 +341,14 @@
                         <>
                             <div className="bg-white pt-6 pb-4 flex flex-col items-center border-b border-gray-50">
                                 <img src="./brand_logo.png" alt="DbS" className="w-[180px] object-contain mb-2" />
-                                <span className="text-[9px] text-gray-400 tracking-[0.3em] font-medium">v4.3 Ultimate Archive</span>
+                                <span className="text-[9px] text-gray-400 tracking-[0.3em] font-medium">v4.4 Ultimate Archive</span>
                             </div>
 
                             <div className="sticky-tabs">
-                                {['All', 'Tops', 'Pants', 'Shoes'].map(f => (
-                                    <button key={f} onClick={() => setFilter(f)} 
-                                        className={`tab-btn ${filter === f ? 'active' : ''}`}>
-                                        {f === 'All' ? '全部' : f === 'Tops' ? '上衣' : f === 'Pants' ? '褲裝' : '鞋履'}
+                                {CATALOG_TABS.map(t => (
+                                    <button key={t.id} onClick={() => setFilter(t.id)} 
+                                        className={`tab-btn ${filter === t.id ? 'active' : ''}`}>
+                                        {t.label}
                                     </button>
                                 ))}
                             </div>
@@ -447,7 +462,7 @@
         };
 
         // --- 4. RENDER ---
-        console.log("v4.3 Render Initiated");
+        console.log("v4.4 Render Initiated");
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
